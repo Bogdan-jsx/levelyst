@@ -10,6 +10,7 @@ const theme = {
     background: '#f6f6f6',  // фон
     surface: '#ffffff',
     onSurface: '#000000',
+    surfaceVariant: '#e3e3e3'
   },
 };
 
@@ -18,6 +19,7 @@ export default function RootLayout() {
     <PaperProvider theme={theme}>
       <Stack screenOptions={{headerShown: false}}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="addTask" options={{headerShown: true}} />
       </Stack>
     </PaperProvider>
   );
