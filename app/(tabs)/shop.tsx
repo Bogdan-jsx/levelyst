@@ -1,10 +1,10 @@
 import { SafeAreaView, Text, View } from "react-native";
 
-export default function TasksScreen() {
+export default function ShopScreen() {
     return (
         <SafeAreaView>
             <View>
-                <Text>Hello world! Its tasks screen, there will be lots of tasks</Text>
+                <Text>Hello world! Its shop screen</Text>
             </View>
         </SafeAreaView>
     )

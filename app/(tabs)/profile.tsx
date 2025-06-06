@@ -4,7 +4,7 @@ export default function TasksScreen() {
     return (
         <SafeAreaView>
             <View>
-                <Text>Hello world! Its tasks screen, there will be lots of tasks</Text>
+                <Text>Hello world! Its profile screen</Text>
             </View>
         </SafeAreaView>
     )
