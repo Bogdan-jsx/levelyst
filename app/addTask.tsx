@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
 import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput } from "react-native-paper";
+import { TaskSectionNames } from './(tabs)';
 
 enum Difficulties {
     EASY = 'Easy',
@@ -20,12 +21,13 @@ const expAmounts = {
 }
 
 export default function AddTask() {
-    const {type, refetch} = useLocalSearchParams()
+    const {name} = useLocalSearchParams()
     const router = useRouter();
 
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<Date>(new Date);
     const [dateOpen, setDateOpen] = useState<boolean>(false);
+    const [repeatEachDays, setRepeatEachDays] = useState<number>(1);
     const [difficultyLevel, setDifficultyLevel] = useState<Difficulties>(Difficulties.EASY);
     const [badges, setBadges] = useState<{name: string, id: number}[]>([]);
     const [selectedBadges, setSelectedBadges] = useState<number[]>([]);
@@ -51,9 +53,9 @@ export default function AddTask() {
 
     const saveTask = useCallback(async () => {
         if (!title || !date || !difficultyLevel) return;
-        await addTask({title, expAmount: expAmounts[difficultyLevel], dueDate: date, badges: selectedBadges, subtasks, repeatEveryDays: null});
+        await addTask({title, expAmount: expAmounts[difficultyLevel], dueDate: date, badges: selectedBadges, subtasks: subtasks[0] !== '' ? subtasks : [], repeatEveryDays: name === TaskSectionNames.SINGLE_TIME ? null : repeatEachDays});
         router.back();
-    }, [date, difficultyLevel, router, selectedBadges, subtasks, title])
+    }, [date, difficultyLevel, name, repeatEachDays, router, selectedBadges, subtasks, title])
 
     return (
         <SafeAreaView style={{flex: 1}}>
@@ -66,7 +68,7 @@ export default function AddTask() {
                         onChange={(event, selectedDate) => {
                             if (selectedDate && selectedDate > new Date()) setDate(selectedDate);
                             if (selectedDate && selectedDate < new Date()) setDate(new Date);
-                        }}
+                        } } 
                     />
                     <Button onPress={() => setDateOpen(false)}>Submit</Button>
                 </Modal>
@@ -78,10 +80,24 @@ export default function AddTask() {
                     <TextInput label={"Title"} value={title} onChangeText={(newVal) => {
                         setTitle(newVal);
                     }} mode="outlined" />
-                    <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'space-between'}}>
-                        <Text variant={'bodyLarge'}>Due date: {date.toLocaleDateString()}</Text>
-                        <Button mode="outlined" onPress={() => setDateOpen(true)}>Change</Button>
-                    </View>
+                    {name === TaskSectionNames.SINGLE_TIME ? (
+                        <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'space-between'}}>
+                            <Text variant={'bodyLarge'}>Due date: {date.toLocaleDateString()}</Text>
+                            <Button mode="outlined" onPress={() => setDateOpen(true)}>Change</Button>
+                        </View>
+                    ) : (
+                        <TextInput 
+                            mode={'outlined'}
+                            keyboardType={'numeric'} 
+                            label={'Repeat once in days:'}
+                            value={String(repeatEachDays)} 
+                            onChangeText={(newVal) => {
+                                const numeric = newVal.replace(/[^0-9]/g, '');
+                                setRepeatEachDays(Number(numeric));
+                            }} 
+                        />
+                    )}
+                    
                     <Text variant={'labelMedium'}>Difficulty level:</Text>
                     <SegmentedButtons
                         value={difficultyLevel}

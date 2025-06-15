@@ -93,3 +93,21 @@ export const getAllBadges = async () => {
         console.log(error);
     }
 }
+
+export const relaunchRepeatableTasks = async () => {
+    try {
+        const repeatableTasks: any = await db.getAllAsync("SELECT * FROM tasks WHERE repeat_every_days IS NOT NULL;")
+        for (const task of repeatableTasks) {
+            if (new Date(task.due_date_string) <= new Date()) {
+                do {
+                    const temp = new Date(task.due_date_string);
+                    temp.setDate(temp.getDate() + task.repeat_every_days);
+                    task.due_date_string = temp.toLocaleDateString();
+                } while (new Date(task.due_date_string) <= new Date());
+                await db.runAsync("UPDATE tasks SET due_date_string = $dateString WHERE id = $id", {$dateString: task.due_date_string, $id: task.id})
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}

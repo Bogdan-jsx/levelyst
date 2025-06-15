@@ -1,4 +1,5 @@
 import db from "./db";
+import { relaunchRepeatableTasks } from "./queries/tasks";
 
 export const initDB = async () => {
     await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
@@ -35,4 +36,5 @@ export const initDB = async () => {
             task_id INTEGER
         );  
     `)
+    await relaunchRepeatableTasks();
 }
