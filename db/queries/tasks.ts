@@ -5,13 +5,9 @@ interface Task {
     title: string,
     expAmount: number,
     dueDate: Date,
-    subtasks: Subtask[],
+    subtasks: string[],
     badges: number[],
     repeatEveryDays: number | null;
-}
-
-interface Subtask {
-    title: string,
 }
 
 interface Badge {
@@ -19,21 +15,18 @@ interface Badge {
 }
 
 export const addTask = async (task: Task) => {
-    console.log('addTasks')
     try {
         const result = await db.runAsync("INSERT INTO tasks (title, exp_amount, due_date_string, repeat_every_days) VALUES ($title, $exp_amount, $due_date_string, $repeat_every_days);", 
             {$title: task.title, $exp_amount: task.expAmount, $due_date_string: task.dueDate.toLocaleDateString(), $repeat_every_days: task.repeatEveryDays});
-        console.log('insert result: ', result);
         if (task?.subtasks?.length > 0) {
-            await db.runAsync(`INSERT INTO subtasks (title, task_id) VALUES ${task.subtasks.map((item: Subtask) => `("${item.title}", ${result.lastInsertRowId})`).join(', ')}`);
+            await db.runAsync(`INSERT INTO subtasks (title, task_id) VALUES ${task.subtasks.map((item: string) => `("${item}", ${result.lastInsertRowId})`).join(', ')}`);
         }
         if (task?.badges?.length > 0) {
             await db.runAsync(`INSERT INTO tasks_badges (task_id, badge_id) VALUES ${task.badges.map((item: number) => `(${result.lastInsertRowId}, "${item}")`).join(', ')}`);
         }
     } catch (error) {
         console.log(error);
-    }
-    
+    }   
 }
 
 export const getAllUndoneTasks = async (type: TaskSectionNames) => {
@@ -45,7 +38,6 @@ export const getAllUndoneTasks = async (type: TaskSectionNames) => {
             ORDER BY due_date_string;`);
         for (const task of tasks) {
             task.subtasks = await db.getAllAsync("SELECT title, done, id FROM subtasks WHERE subtasks.task_id = $taskId", {$taskId: task.id});
-            console.log('get all subtasks ', task.subtasks)
             task.badges = await db.getAllAsync(`
                 SELECT badges.* 
                 FROM badges
@@ -91,4 +83,13 @@ export const addBadge = async (badge: Badge) => {
     } catch (error) {
         console.log(error);
     }   
+}
+
+export const getAllBadges = async () => {
+    try {
+        const result = await db.getAllAsync("SELECT * FROM badges;")
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
 }

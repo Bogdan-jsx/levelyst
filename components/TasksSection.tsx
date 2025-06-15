@@ -1,8 +1,9 @@
 import { TaskSectionNames } from "@/app/(tabs)";
 import { getAllUndoneTasks, toggleSubtaskDone, toggleTaskDone } from "@/db/queries/tasks";
 import { AntDesign } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { Card, Checkbox, Chip, List, Text, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,9 +23,11 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
         setUndoneTasks(temp);
     }, [name])
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData, name]);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [])
+    )
     
     return (
         <Card mode={"contained"} theme={theme} style={{minHeight: halfHeight}}>
