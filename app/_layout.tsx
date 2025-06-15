@@ -1,4 +1,6 @@
+import { initDB } from "@/db/initDB";
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 import { MD3LightTheme, PaperProvider } from "react-native-paper";
 
 const theme = {
@@ -15,6 +17,10 @@ const theme = {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    initDB();
+  }, [])
+
   return (
     <PaperProvider theme={theme}>
       <Stack screenOptions={{headerShown: false}}>

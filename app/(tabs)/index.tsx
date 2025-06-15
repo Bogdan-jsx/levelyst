@@ -1,6 +1,12 @@
 import TasksSection from "@/components/TasksSection";
+import { useEffect } from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export enum TaskSectionNames {
+    SINGLE_TIME = "Single-time tasks",
+    REPEATABLE = "Repeatable tasks"
+}
 
 const singleTimeTasksMock = [
     {title: "task 1", done: false, dueDate: new Date(), experience: 15, badges: ["Studies", "Urgent", "Chemisty", "Urgent", "Chemisty", "Urgent", "Chemisty"], id: 1, subtasks: [{title: 'subtask 1', done: false, id: 8}, {title: 'subtask 2', done: false, id: 9}]},
@@ -18,11 +24,20 @@ const repeatableTasksMock = [
 export default function TasksScreen() {
     const insets = useSafeAreaInsets();
 
+    useEffect(() => {
+        // addTask({title: 'Test task 2', dueDate: new Date(), expAmount: 18, subtasks: [{title: "test subtask 1"}, {title: "test subtask 2"}], badges: [1, 2], repeatEveryDays: null});
+        // addTask({title: 'Test task 3', dueDate: new Date(), expAmount: 16, subtasks: [{title: "test subtask 3"}, {title: "test subtask 5"}], badges: [2], repeatEveryDays: 3});
+        // getAllUndoneOneTimeTasks();
+        // addBadge({name: 'Urgent'});
+        // addBadge({name: 'Studies'});
+        // addBadge({name: 'Chemistry'});
+    }, []);
+
     return (
         <ScrollView style={{marginTop: insets.top + 12}}>
             <View style={{gap: 12, paddingBottom: 12, paddingHorizontal: 8}}>
-                <TasksSection name={'Single-time tasks'} tasks={singleTimeTasksMock} type={'singleTime'} />
-                <TasksSection name={'Repeatable tasks'} tasks={repeatableTasksMock} type={'repeatable'} />
+                <TasksSection name={TaskSectionNames.SINGLE_TIME} />
+                <TasksSection name={TaskSectionNames.REPEATABLE} />
             </View>
         </ScrollView>
     )
