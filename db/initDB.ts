@@ -2,6 +2,7 @@ import db from "./db";
 import { relaunchRepeatableTasks } from "./queries/tasks";
 
 export const initDB = async () => {
+    // console.log(await db.getAllAsync("SELECt * FROM tasks;"))
     await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
     await db.runAsync(`
         CREATE TABLE IF NOT EXISTS tasks (
@@ -35,6 +36,19 @@ export const initDB = async () => {
             done BOOLEAN DEFAULT false,
             task_id INTEGER
         );  
+    `)
+    await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS profile (
+            nickname TEXT,
+            level INTEGER,
+            exp_gained INTEGER,
+            completed_singletime_tasks_weekly INTEGER,
+            completed_repeatable_tasks_weekly INTEGER,
+            completed_insane_tasks_weekly INTEGER,
+            exp_gained_weekly INTEGER,
+            achievements_gained_weekly INTEGER,
+            saved_week_number INTEGER
+        )
     `)
     await relaunchRepeatableTasks();
 }

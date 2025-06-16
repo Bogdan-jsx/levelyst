@@ -6,14 +6,14 @@ import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "
 import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput } from "react-native-paper";
 import { TaskSectionNames } from './(tabs)';
 
-enum Difficulties {
+export enum Difficulties {
     EASY = 'Easy',
     MEDIUM = 'Medium',
     HARD = 'Hard',
     INSANE = 'Insane'
 }
 
-const expAmounts = {
+export const expAmounts = {
     [Difficulties.EASY]: 10,
     [Difficulties.MEDIUM]: 15,
     [Difficulties.HARD]: 20,
@@ -68,7 +68,7 @@ export default function AddTask() {
                         onChange={(event, selectedDate) => {
                             if (selectedDate && selectedDate > new Date()) setDate(selectedDate);
                             if (selectedDate && selectedDate < new Date()) setDate(new Date);
-                        } } 
+                        }} 
                     />
                     <Button onPress={() => setDateOpen(false)}>Submit</Button>
                 </Modal>

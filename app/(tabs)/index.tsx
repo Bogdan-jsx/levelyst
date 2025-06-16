@@ -25,6 +25,7 @@ export default function TasksScreen() {
     const insets = useSafeAreaInsets();
 
     useEffect(() => {
+        // initProfile('Created nickname')
         // addTask({title: 'Test task 2', dueDate: new Date(), expAmount: 18, subtasks: [{title: "test subtask 1"}, {title: "test subtask 2"}], badges: [1, 2], repeatEveryDays: null});
         // addTask({title: 'Test task 3', dueDate: new Date(), expAmount: 16, subtasks: [{title: "test subtask 3"}, {title: "test subtask 5"}], badges: [2], repeatEveryDays: 3});
         // getAllUndoneOneTimeTasks();

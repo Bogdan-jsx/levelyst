@@ -1,5 +1,7 @@
 import { TaskSectionNames } from "@/app/(tabs)";
+import { Difficulties, expAmounts } from "@/app/addTask";
 import db from "../db";
+import { checkAndUpLevel } from "./profile";
 
 interface Task {
     title: string,
@@ -29,13 +31,13 @@ export const addTask = async (task: Task) => {
     }   
 }
 
-export const getAllUndoneTasks = async (type: TaskSectionNames) => {
+export const getAllTasks = async (type: TaskSectionNames) => {
     try {
         const tasks: any[] = await db.getAllAsync(`
             SELECT * 
             FROM tasks 
-            WHERE done = false AND repeat_every_days IS${type === TaskSectionNames.REPEATABLE ? " NOT" : ""} NULL 
-            ORDER BY due_date_string;`);
+            WHERE repeat_every_days IS${type === TaskSectionNames.REPEATABLE ? " NOT" : ""} NULL ${type === TaskSectionNames.REPEATABLE ? "" : "AND done = 0"}
+            ORDER BY done DESC, due_date_string;`);
         for (const task of tasks) {
             task.subtasks = await db.getAllAsync("SELECT title, done, id FROM subtasks WHERE subtasks.task_id = $taskId", {$taskId: task.id});
             task.badges = await db.getAllAsync(`
@@ -57,6 +59,15 @@ export const toggleTaskDone = async (newValue: number, id: number, setSubtasks: 
         await db.runAsync(`UPDATE tasks SET done = $newValue WHERE id = $id`, {$id: id, $newValue: newValue})
         if (setSubtasks) {
             await db.runAsync(`UPDATE subtasks SET done = $newValue WHERE task_id = $id`, {$id: id, $newValue: newValue})
+        }
+        if (newValue === 1) {
+            const task: any = await db.getFirstAsync("SELECT * FROM tasks WHERE id = $id", {$id: id});
+            const fieldType = `completed_${task.repeat_every_days === null ? 'repeatable' : 'singletime'}_tasks_weekly`
+            await db.runAsync(`UPDATE profile SET ${fieldType} = ${fieldType} + 1, exp_gained_weekly = exp_gained_weekly + $expAmount, exp_gained = exp_gained + $expAmount;`, {$expAmount: task.exp_amount})
+            if (task.exp_amount === expAmounts[Difficulties.INSANE]) {
+                await db.runAsync("UPDATE profile SET completed_insane_tasks_weekly = completed_insane_tasks_weekly + 1;")
+            }
+            await checkAndUpLevel();
         }
     } catch (error) {
         console.log(error)
