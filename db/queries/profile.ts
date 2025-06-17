@@ -80,3 +80,11 @@ export const checkAndUpLevel = async () => {
         console.log(error);
     }
 }
+
+export const changeUsername = async (newVal: string) => {
+    try {
+        await db.runAsync("UPDATE profile SET nickname = $newVal", {$newVal: newVal});
+    } catch (error) {
+        console.log(error);
+    }
+}

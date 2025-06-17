@@ -27,9 +27,16 @@ export default function ShopScreen() {
         }, [fetchData])
     )
 
+    const shouldDisableBtn = useCallback((item: any) => {
+        if (item.is_owned && item.name === themeName) return true;
+        if (!item.is_owned && profile?.coins < item.price) return true;
+        return false;
+    }, [profile?.coins, themeName])
+
     return (
         <SafeAreaView style={{backgroundColor: theme.colors.background, flex: 1}}>
             <View style={{padding: 8, gap: 12}}>
+                <Text variant={'titleLarge'}>Coins: {profile?.coins}</Text>
                 <Text variant={'titleLarge'}>Themes: </Text>
                 <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12}}>
                     {themes && themes.map((item: any) => (
@@ -42,14 +49,12 @@ export default function ShopScreen() {
                                 </View>
                                 <Text variant={'labelLarge'}>{item.title}</Text>
                                 <Text>Price: {item.price} coins</Text>
-                                <Button disabled={themeName === item.name} onPress={() => {
+                                <Button disabled={shouldDisableBtn(item)} onPress={() => {
                                     if (!item.is_owned) {
                                         if (profile.coins > item.price) {
                                             buyTheme(item.id, item.price);
                                             changeThemeName(item.name as ThemeNames);
                                             fetchData();
-                                        } else {
-                                            console.log('aboba')
                                         }
                                     } else {
                                         changeThemeName(item.name as ThemeNames)
