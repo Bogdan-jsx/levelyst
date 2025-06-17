@@ -9,7 +9,12 @@ export default function TabLayout() {
         <Tabs screenOptions={{
             headerShown: false,
             tabBarButton: HapticTab,
-            tabBarActiveTintColor: theme.colors.primary
+            tabBarActiveTintColor: theme.colors.primary,
+            tabBarInactiveTintColor: theme.colors.secondary,
+            tabBarStyle: {
+                backgroundColor: theme.colors.background,
+                borderColor: theme.colors.outline
+            }
         }}>
             <Tabs.Screen name="index" options={{ title: "Tasks", tabBarIcon: ({color}) => <FontAwesome5 name="tasks" size={24} color={color} /> }} />
             <Tabs.Screen name="quests" options={{ title: "Quests", tabBarIcon: ({color}) => <Octicons name="tasklist" size={24} color={color} /> }} />

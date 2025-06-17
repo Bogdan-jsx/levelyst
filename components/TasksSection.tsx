@@ -93,7 +93,7 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                     titleVariant={"titleLarge"}
                     right={() => (
                         <Link href={{ pathname: "/addTask", params: { name } }} style={{ marginRight: 12 }}>
-                            <AntDesign name="plus" size={24} color="black" />
+                            <AntDesign name="plus" size={24} color={theme.colors.onBackground} />
                         </Link>
                     )} />
                 <Card.Content style={{ paddingHorizontal: 8, gap: 4 }}>
@@ -103,9 +103,9 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                                 style={{ minHeight: 0, marginTop: 10 }}
                                 title={item.title}
                                 titleNumberOfLines={3}
-                                titleStyle={{ textDecorationLine: item.done ? 'line-through' : 'none', textDecorationColor: 'black' }}
+                                titleStyle={{ textDecorationLine: item.done ? 'line-through' : 'none', textDecorationColor: theme.colors.onBackground }}
                                 right={() => (
-                                    <View style={{ borderColor: 'black', borderWidth: 1, borderRadius: '50%', marginRight: 8 }}>
+                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: 1, borderRadius: '50%', marginRight: 8 }}>
                                         <Checkbox status={item.done === 1 ? 'checked' : 'unchecked'} disabled={item.done === 1} onPress={() => onTaskDonePress(item)} />
                                     </View>
                                 )} />
@@ -113,19 +113,19 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                                 <Text variant={"labelSmall"}>{`Complete this task until ${item.due_date_string} to gain ${item.exp_amount} experience`}</Text>
                                 <View style={{ display: "flex", flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 8, marginBottom: 8 }}>
                                     {item.badges && item.badges.map((item: any, index: number) => (
-                                        <Chip key={index} disabled style={{ backgroundColor: "#d9cece" }} compact>{item.name}</Chip>
+                                        <Chip key={index} disabled compact>{item.name}</Chip>
                                     ))}
                                 </View>
                                 {item?.subtasks?.length ? (
-                                    <List.Accordion title={<Text variant={'titleSmall'}>Expand subtasks</Text>} style={{ backgroundColor: 'white', paddingVertical: 0, marginVertical: 0 }}>
+                                    <List.Accordion title={<Text variant={'titleSmall'}>Expand subtasks</Text>} style={{ paddingVertical: 0, marginVertical: 0 }}>
                                         {item.subtasks.map((subtask: any) => (
                                             <List.Item
                                                 key={subtask.id}
                                                 title={subtask.title}
-                                                titleStyle={{ textDecorationLine: subtask.done === 1 ? 'line-through' : 'none', textDecorationColor: 'black' }}
+                                                titleStyle={{ textDecorationLine: subtask.done === 1 ? 'line-through' : 'none', textDecorationColor: theme.colors.onBackground }}
                                                 style={{ paddingVertical: 0 }}
                                                 right={() => (
-                                                    <View style={{ borderColor: 'black', borderWidth: 1, borderRadius: '50%' }}>
+                                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: 1, borderRadius: '50%' }}>
                                                         <Checkbox status={subtask.done === 1 ? 'checked' : 'unchecked'} disabled={item.done === 1} onPress={() => {
                                                             setTaskItemId(item.id);
                                                             setSubtaskItemId(subtask.id);

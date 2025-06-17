@@ -1,7 +1,9 @@
+import { themesForDB } from "@/theme/themesConfig";
 import db from "./db";
 import { checkAndResetDailyStats, checkAndResetWeeklyStats, initProfile } from "./queries/profile";
 import { initQuests, resetQuests } from "./queries/quests";
 import { relaunchRepeatableTasks } from "./queries/tasks";
+import { addTheme } from "./queries/themes";
 
 export const initDB = async () => {
     // await db.runAsync("DROP TABLE IF EXISTS profile;")
@@ -81,6 +83,18 @@ export const initDB = async () => {
             related_to_field TEXT
         )
     `)
+    await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS themes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            main_color_to_display TEXT,
+            secondary_color_to_display TEXT,
+            last_color_to_display TEXT,
+            price INTEGER,
+            is_owned BOOLEAN DEFAULT false,
+            name TEXT
+        )
+    `)
     
     // Init
 
@@ -94,4 +108,14 @@ export const initDB = async () => {
     await checkAndResetWeeklyStats();
     await checkAndResetDailyStats();
     await resetQuests();
+
+    await db.runAsync("DELETE FROM themes;")
+
+    const allThemes = await db.getAllAsync("SELECT * FROM themes;")
+    if (allThemes.length <= 0) {
+        for (const theme of themesForDB) {
+            await addTheme(theme);
+        }
+        await db.runAsync("UPDATE themes SET is_owned = 1;")
+    }
 }

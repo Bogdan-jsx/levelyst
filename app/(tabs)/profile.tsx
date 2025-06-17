@@ -2,9 +2,10 @@ import { getProfile } from "@/db/queries/profile";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, SafeAreaView, ScrollView, View } from "react-native";
-import { Avatar, Divider, ProgressBar, Text } from "react-native-paper";
+import { Avatar, Divider, ProgressBar, Text, useTheme } from "react-native-paper";
 
 export default function TasksScreen() {
+    const theme = useTheme();
     const screenWidth = Dimensions.get('window').width;
 
     const [profile, setProfile] = useState<any>();
@@ -28,13 +29,13 @@ export default function TasksScreen() {
     )
     
     return (
-        <SafeAreaView style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
             <ScrollView>
                 <View style={{alignItems: 'center', paddingTop: 24, gap: 8, width: '100%', marginBottom: 12}}>
                     <Avatar.Icon icon={'account-circle-outline'} size={128}/>
                     <Text variant={'headlineLarge'}>{profile?.nickname}</Text>
                     <Text variant={'labelLarge'}>Level {profile?.level}</Text>
-                    <ProgressBar progress={progress} color={'black'} style={{width: screenWidth - 24}} />
+                    <ProgressBar progress={progress} style={{width: screenWidth - 24, backgroundColor: theme.colors.surface}} />
                     <Text variant={'labelLarge'}>Gain {(profile?.level * 150) - profile?.exp_gained} more experience points to level up</Text>
                 </View>
                 <Divider />

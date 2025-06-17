@@ -2,8 +2,8 @@ import { addTask, getAllBadges } from '@/db/queries/tasks';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
-import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput } from "react-native-paper";
+import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
+import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
 import { TaskSectionNames } from './(tabs)';
 
 export enum Difficulties {
@@ -21,6 +21,7 @@ export const expAmounts = {
 }
 
 export default function AddTask() {
+    const theme = useTheme();
     const {name} = useLocalSearchParams()
     const router = useRouter();
 
@@ -58,7 +59,7 @@ export default function AddTask() {
     }, [date, difficultyLevel, name, repeatEachDays, router, selectedBadges, subtasks, title])
 
     return (
-        <SafeAreaView style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
             <Portal>
                 <Modal visible={dateOpen} onDismiss={() => setDateOpen(false)} contentContainerStyle={{backgroundColor: 'white', padding: 20, margin: 10}}>
                     <DateTimePicker
@@ -70,7 +71,7 @@ export default function AddTask() {
                             if (selectedDate && selectedDate < new Date()) setDate(new Date);
                         }} 
                     />
-                    <Button onPress={() => setDateOpen(false)}>Submit</Button>
+                    <Button onPress={() => setDateOpen(false)} textColor='black'>Submit</Button>
                 </Modal>
             </Portal>
             <View style={{flex: 1}}>
@@ -83,7 +84,10 @@ export default function AddTask() {
                     {name === TaskSectionNames.SINGLE_TIME ? (
                         <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'space-between'}}>
                             <Text variant={'bodyLarge'}>Due date: {date.toLocaleDateString()}</Text>
-                            <Button mode="outlined" onPress={() => setDateOpen(true)}>Change</Button>
+                            <Button mode="outlined" onPress={() => {
+                                setDateOpen(true);
+                                Keyboard.dismiss();
+                            }}>Change</Button>
                         </View>
                     ) : (
                         <TextInput 
