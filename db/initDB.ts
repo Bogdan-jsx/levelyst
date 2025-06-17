@@ -8,7 +8,7 @@ import { addTheme } from "./queries/themes";
 export const initDB = async () => {
     // await db.runAsync("DROP TABLE IF EXISTS profile;")
     // console.log(await db.getAllAsync("SELECt * FROM profile;"))
-    await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
+    // await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
     // await db.runAsync("UPDATE quests SET active = 0 WHERE id > 0")
 
     await db.runAsync(`

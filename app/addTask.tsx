@@ -2,8 +2,9 @@ import { addTask, getAllBadges } from '@/db/queries/tasks';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
+import { Appearance, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
 import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TaskSectionNames } from './(tabs)';
 
 export enum Difficulties {
@@ -24,6 +25,8 @@ export default function AddTask() {
     const theme = useTheme();
     const {name} = useLocalSearchParams()
     const router = useRouter();
+    const insets = useSafeAreaInsets();
+    const colorScheme = Appearance.getColorScheme();
 
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<Date>(new Date);
@@ -59,9 +62,9 @@ export default function AddTask() {
     }, [date, difficultyLevel, name, repeatEachDays, router, selectedBadges, subtasks, title])
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background, paddingBottom: Platform.OS === 'android' ? insets.bottom : 0}}>
             <Portal>
-                <Modal visible={dateOpen} onDismiss={() => setDateOpen(false)} contentContainerStyle={{backgroundColor: 'white', padding: 20, margin: 10}}>
+                <Modal visible={dateOpen} onDismiss={() => setDateOpen(false)} contentContainerStyle={Platform.OS === 'ios' ? {backgroundColor: colorScheme === 'dark' ? 'black' : 'white', padding: 20, margin: 10} : {}}>
                     <DateTimePicker
                         value={date}
                         mode="date"
@@ -69,9 +72,10 @@ export default function AddTask() {
                         onChange={(event, selectedDate) => {
                             if (selectedDate && selectedDate > new Date()) setDate(selectedDate);
                             if (selectedDate && selectedDate < new Date()) setDate(new Date);
+                            if (Platform.OS === 'android') setDateOpen(false);
                         }} 
                     />
-                    <Button onPress={() => setDateOpen(false)} textColor='black'>Submit</Button>
+                    <Button onPress={() => setDateOpen(false)} textColor={colorScheme === 'dark' ? 'white' : 'black'}>Submit</Button>
                 </Modal>
             </Portal>
             <View style={{flex: 1}}>
@@ -125,7 +129,7 @@ export default function AddTask() {
                             }
                         ]}
                     />
-                    {badges.length > 0 ? (
+                    {badges && badges.length > 0 ? (
                         <>
                         <Text variant={'labelMedium'}>Badges (optional):</Text>
                         <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 4}}>

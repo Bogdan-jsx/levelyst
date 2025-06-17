@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { useCallback, useState } from "react";
-import { useWindowDimensions, View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import { Button, Card, Checkbox, Chip, Dialog, List, Portal, Text, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -105,7 +105,7 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                                 titleNumberOfLines={3}
                                 titleStyle={{ textDecorationLine: item.done ? 'line-through' : 'none', textDecorationColor: theme.colors.onBackground }}
                                 right={() => (
-                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: 1, borderRadius: '50%', marginRight: 8 }}>
+                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: Platform.OS === 'ios' ? 1 : 0, borderRadius: '50%', marginRight: 8 }}>
                                         <Checkbox status={item.done === 1 ? 'checked' : 'unchecked'} disabled={item.done === 1} onPress={() => onTaskDonePress(item)} />
                                     </View>
                                 )} />
@@ -125,7 +125,7 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                                                 titleStyle={{ textDecorationLine: subtask.done === 1 ? 'line-through' : 'none', textDecorationColor: theme.colors.onBackground }}
                                                 style={{ paddingVertical: 0 }}
                                                 right={() => (
-                                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: 1, borderRadius: '50%' }}>
+                                                    <View style={{ borderColor: theme.colors.onBackground, borderWidth: Platform.OS === 'ios' ? 1 : 0, borderRadius: '50%' }}>
                                                         <Checkbox status={subtask.done === 1 ? 'checked' : 'unchecked'} disabled={item.done === 1} onPress={() => {
                                                             setTaskItemId(item.id);
                                                             setSubtaskItemId(subtask.id);

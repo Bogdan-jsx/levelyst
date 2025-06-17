@@ -1,11 +1,13 @@
 import { changeUsername, getProfile } from "@/db/queries/profile";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Dimensions, SafeAreaView, ScrollView, View } from "react-native";
+import { Dimensions, Platform, SafeAreaView, ScrollView, View } from "react-native";
 import { Avatar, Button, Divider, ProgressBar, Text, TextInput, useTheme } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TasksScreen() {
     const theme = useTheme();
+    const insets = useSafeAreaInsets();
     const screenWidth = Dimensions.get('window').width;
 
     const [profile, setProfile] = useState<any>();
@@ -31,7 +33,7 @@ export default function TasksScreen() {
     )
     
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background, paddingTop: Platform.OS === 'android' ? insets.top + 12 : 0}}>
             <ScrollView>
                 <View style={{alignItems: 'center', paddingTop: 24, gap: 8, width: '100%', marginBottom: 12}}>
                     <Avatar.Icon icon={'account-circle-outline'} size={128}/>
