@@ -1,4 +1,4 @@
-import { getWeek } from 'date-fns';
+import { getDayOfYear, getWeek } from 'date-fns';
 import db from "../db";
 
 
@@ -9,8 +9,8 @@ export const initProfile = async (nickname: string) => {
         });
         await db.runAsync(`
             INSERT INTO profile
-            (nickname, level, exp_gained, completed_singletime_tasks_weekly, completed_repeatable_tasks_weekly, completed_insane_tasks_weekly, exp_gained_weekly, achievements_gained_weekly, saved_week_number) 
-            VALUES ($nickname, 1, 0, 0, 0, 0, 0, 0, $weekNum);   
+            (nickname, saved_week_number) 
+            VALUES ($nickname, $weekNum);   
         `, {$nickname: nickname, $weekNum: weekNumber})
     } catch (error) {
         console.log(error);
@@ -29,10 +29,32 @@ export const checkAndResetWeeklyStats = async () => {
                 SET completed_singletime_tasks_weekly = 0,
                 completed_repeatable_tasks_weekly = 0,
                 completed_insane_tasks_weekly = 0,
+                completed_hard_tasks_weekly = 0,
                 exp_gained_weekly = 0,
                 achievements_gained_weekly = 0,
+                completed_tasks_weekly = 0,
                 saved_week_number = $newWeekNum
             `, {$newWeekNum: weekNumber})
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const checkAndResetDailyStats = async () => {
+    try {
+        const dayNumber = getDayOfYear(new Date());
+        const user: any = await db.getFirstAsync("SELECT * FROM profile;");
+        if (user.saved_day_number !== dayNumber) {
+            await db.runAsync(`
+                UPDATE profile
+                SET completed_tasks_daily = 0,
+                completed_singletime_tasks_daily = 0,
+                completed_repeatable_tasks_daily = 0,
+                completed_hard_tasks_daily = 0,
+                exp_gained_daily = 0,
+                saved_day_number = $newDayNum
+            `, {$newDayNum: dayNumber})
         }
     } catch (error) {
         console.log(error);

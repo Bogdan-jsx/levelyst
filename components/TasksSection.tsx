@@ -45,14 +45,12 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
     }, [])
 
     const onSubtaskDoneConfirm = useCallback(async (newVal: any, subtaskId: number = 0, taskId: number = 0) => {
-        console.log('ondone', taskItemId, subtaskItemId)
         await toggleSubtaskDone(newVal, subtaskId || subtaskItemId, taskId || taskItemId);
         fetchData();
         setSubtaskDialogVisible(false);
     }  , [fetchData, subtaskItemId, taskItemId]) 
 
     const onSubtaskDonePress = useCallback((subtask: any, task: any) => {
-        console.log('on press', task, subtask)
         setTaskItemId(task.id);
         setSubtaskItemId(subtask.id);
 

@@ -2,6 +2,7 @@ import { TaskSectionNames } from "@/app/(tabs)";
 import { Difficulties, expAmounts } from "@/app/addTask";
 import db from "../db";
 import { checkAndUpLevel } from "./profile";
+import { updateQuestsStatus } from "./quests";
 
 interface Task {
     title: string,
@@ -62,12 +63,25 @@ export const toggleTaskDone = async (newValue: number, id: number, setSubtasks: 
         }
         if (newValue === 1) {
             const task: any = await db.getFirstAsync("SELECT * FROM tasks WHERE id = $id", {$id: id});
-            const fieldType = `completed_${task.repeat_every_days === null ? 'repeatable' : 'singletime'}_tasks_weekly`
-            await db.runAsync(`UPDATE profile SET ${fieldType} = ${fieldType} + 1, exp_gained_weekly = exp_gained_weekly + $expAmount, exp_gained = exp_gained + $expAmount;`, {$expAmount: task.exp_amount})
-            if (task.exp_amount === expAmounts[Difficulties.INSANE]) {
-                await db.runAsync("UPDATE profile SET completed_insane_tasks_weekly = completed_insane_tasks_weekly + 1;")
-            }
+            const fieldWeeklyType = `completed_${task.repeat_every_days !== null ? 'repeatable' : 'singletime'}_tasks_weekly`;
+            const fieldDailyType = `completed_${task.repeat_every_days !== null ? 'repeatable' : 'singletime'}_tasks_daily`;
+
+            // Updating stats
+            await db.runAsync(`
+                UPDATE profile 
+                SET ${fieldWeeklyType} = ${fieldWeeklyType} + 1, 
+                ${fieldDailyType} = ${fieldDailyType} + 1,
+                completed_tasks_weekly = completed_tasks_weekly + 1,
+                completed_tasks_daily = completed_tasks_daily + 1,
+                ${task.exp_amount === expAmounts[Difficulties.INSANE] ? "completed_insane_tasks_weekly = completed_insane_tasks_weekly + 1," : ""}
+                ${task.exp_amount === expAmounts[Difficulties.HARD] ? "completed_hard_tasks_weekly = completed_hard_tasks_weekly + 1," : ""}
+                ${task.exp_amount === expAmounts[Difficulties.HARD] ? "completed_hard_tasks_daily = completed_hard_tasks_daily + 1," : ""}
+                exp_gained_weekly = exp_gained_weekly + $expAmount, 
+                exp_gained_daily = exp_gained_daily + $expAmount,
+                exp_gained = exp_gained + $expAmount;
+            `, {$expAmount: task.exp_amount})
             await checkAndUpLevel();
+            await updateQuestsStatus();
         }
     } catch (error) {
         console.log(error)

@@ -1,0 +1,54 @@
+[
+    {
+        "template": "Complete *template* tasks of any difficulty",
+        "title": "",
+        "progress": 0,
+        "goal": 0,
+        "done": false,
+        "active": false,
+        "basic_reward": 3,
+        "reward": 0,
+        "min_goal": 2,
+        "max_goal": 6, 
+        "related_to_field": "completed_tasks_daily"
+    },
+    {
+        "template": "Complete *template* task of hard level",
+        "title": "",
+        "progress": 0,
+        "goal": 0,
+        "done": false,
+        "active": false,
+        "basic_reward": 6,
+        "reward": 0,
+        "min_goal": 1,
+        "max_goal": 3, 
+        "related_to_field": "completed_hard_tasks_daily"
+    },
+    {
+        "template": "Complete *template* repeatable task(s) of any difficulty",
+        "title": "",
+        "progress": 0,
+        "goal": 0,
+        "done": false,
+        "active": false,
+        "basic_reward": 4,
+        "reward": 0,
+        "min_goal": 1,
+        "max_goal": 3, 
+        "related_to_field": "completed_repeatable_tasks_daily"
+    },
+    {
+        "template": "Gain *template* experience",
+        "title": "",
+        "progress": 0,
+        "goal": 0,
+        "done": false,
+        "active": false,
+        "basic_reward": 0.1,
+        "reward": 0,
+        "min_goal": 40,
+        "max_goal": 120, 
+        "related_to_field": "exp_gained_daily"
+    }
+]
