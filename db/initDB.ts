@@ -10,7 +10,7 @@ export const initDB = async () => {
     // console.log(await db.getAllAsync("SELECt * FROM profile;"))
     // await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
     // await db.runAsync("UPDATE quests SET active = 0 WHERE id > 0")
-
+    // await db.runAsync("DROP TABLE IF EXISTS themes;")
     await db.runAsync(`
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,9 +87,11 @@ export const initDB = async () => {
         CREATE TABLE IF NOT EXISTS themes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
-            main_color_to_display TEXT,
-            secondary_color_to_display TEXT,
-            last_color_to_display TEXT,
+            primary_color TEXT,
+            secondary_color TEXT,
+            surface_color TEXT,
+            on_surface_color TEXT,
+            background_color TEXT,
             price INTEGER,
             is_owned BOOLEAN DEFAULT false,
             name TEXT
@@ -118,4 +120,6 @@ export const initDB = async () => {
         }
         await db.runAsync("UPDATE themes SET is_owned = 1 WHERE name = 'dark' OR name = 'light';")
     }
+
+    // await db.runAsync("UPDATE profile SET coins = 100")
 }

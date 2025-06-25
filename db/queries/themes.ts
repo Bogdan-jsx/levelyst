@@ -3,9 +3,11 @@ import db from "../db";
 interface Theme {
     name: string,
     title: string,
-    main_color_to_display: string,
-    secondary_color_to_display: string,
-    last_color_to_display: string,
+    primary: string,
+    secondary: string,
+    surface: string,
+    onSurface: string,
+    background: string,
     price: number,
 }
 
@@ -13,9 +15,9 @@ export const addTheme = async (theme: Theme) => {
     try {
         await db.runAsync(`
             INSERT INTO themes 
-            (name, title, main_color_to_display, secondary_color_to_display, last_color_to_display, price)
-            VALUES ($name, $title, $main_color_to_display, $secondary_color_to_display, $last_color_to_display, $price)`,
-        {$name: theme.name, $title: theme.title, $main_color_to_display: theme.main_color_to_display, $secondary_color_to_display: theme.secondary_color_to_display, $last_color_to_display: theme.last_color_to_display, $price: theme.price})
+            (name, title, primary_color, secondary_color, surface_color, on_surface_color, background_color, price)
+            VALUES ($name, $title, $primary_color, $secondary_color, $surface_color, $on_surface_color, $background_color, $price)`,
+        {$name: theme.name, $title: theme.title, $primary_color: theme.primary, $secondary_color: theme.secondary, $surface_color: theme.surface, $on_surface_color: theme.onSurface, $background_color: theme.background, $price: theme.price})
     } catch (error) {
         console.log(error);
     }

@@ -2,8 +2,8 @@ import { addTask, getAllBadges } from '@/db/queries/tasks';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Appearance, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, View } from "react-native";
-import { Button, Chip, Divider, Modal, Portal, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
+import { Appearance, Keyboard, Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Button, Modal, Portal, SegmentedButtons, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TaskSectionNames } from './(tabs)';
 
@@ -62,7 +62,7 @@ export default function AddTask() {
     }, [date, difficultyLevel, name, repeatEachDays, router, selectedBadges, subtasks, title])
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background, paddingBottom: Platform.OS === 'android' ? insets.bottom : 0}}>
+        <SafeAreaView>
             <Portal>
                 <Modal visible={dateOpen} onDismiss={() => setDateOpen(false)} contentContainerStyle={Platform.OS === 'ios' ? {backgroundColor: colorScheme === 'dark' ? 'black' : 'white', padding: 20, margin: 10} : {}}>
                     <DateTimePicker
@@ -78,38 +78,22 @@ export default function AddTask() {
                     <Button onPress={() => setDateOpen(false)} textColor={colorScheme === 'dark' ? 'white' : 'black'}>Submit</Button>
                 </Modal>
             </Portal>
-            <View style={{flex: 1}}>
-                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? 98 : 0}>
-                <ScrollView ref={scrollRef} style={{flex: 1}} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-                    <View style={{flex: 1, padding: 8, gap: 8}}>
-                    <TextInput label={"Title"} value={title} onChangeText={(newVal) => {
-                        setTitle(newVal);
-                    }} mode="outlined" />
-                    {name === TaskSectionNames.SINGLE_TIME ? (
-                        <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'space-between'}}>
-                            <Text variant={'bodyLarge'}>Due date: {date.toLocaleDateString()}</Text>
-                            <Button mode="outlined" onPress={() => {
-                                setDateOpen(true);
-                                Keyboard.dismiss();
-                            }}>Change</Button>
-                        </View>
-                    ) : (
-                        <TextInput 
-                            mode={'outlined'}
-                            keyboardType={'numeric'} 
-                            label={'Repeat once in days:'}
-                            value={String(repeatEachDays)} 
-                            onChangeText={(newVal) => {
-                                const numeric = newVal.replace(/[^0-9]/g, '');
-                                setRepeatEachDays(Number(numeric));
-                            }} 
-                        />
-                    )}
-                    
-                    <Text variant={'labelMedium'}>Difficulty level:</Text>
-                    <SegmentedButtons
+            <View style={{paddingVertical: 24, paddingHorizontal: 16, gap: 24}}>
+                <TextInput placeholder='Title...'  placeholderTextColor={theme.colors.secondary} style={{paddingVertical: 8, paddingHorizontal: 16, borderColor: theme.colors.secondary, borderWidth: 2, borderRadius: 18.5}} />
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Text style={{fontFamily: 'Nunito Sans', fontSize: 14, color: theme.colors.onBackground}}>To complete until <Text style={{fontWeight: 600, color: theme.colors.primary}}>{date.toLocaleDateString()}</Text></Text>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            setDateOpen(true);
+                            Keyboard.dismiss();
+                        }}>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 14, fontWeight: 600, color: theme.colors.primary, textDecorationStyle: 'solid', textDecorationColor: theme.colors.primary, textDecorationLine: 'underline'}}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
+                <SegmentedButtons
                         value={difficultyLevel}
                         onValueChange={setDifficultyLevel}
+                        style={{borderColor: theme.colors.secondary, borderWidth: 2}}
                         buttons={[
                             {
                                 value: Difficulties.EASY,
@@ -129,72 +113,16 @@ export default function AddTask() {
                             }
                         ]}
                     />
-                    {badges && badges.length > 0 ? (
-                        <>
-                        <Text variant={'labelMedium'}>Badges (optional):</Text>
-                        <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 4}}>
-                            {badges.map((item) => (
-                                <Chip 
-                                    key={item.id} 
-                                    mode='outlined' 
-                                    onPress={() => toggleSelectedBadge(item.id)} 
-                                    selected={selectedBadges.indexOf(item.id) !== -1}
-                                >
-                                    {item.name}
-                                </Chip>
-                            ))}
-                        </View></>
-                    ) : null}
-                    <Text variant={"labelMedium"}>Subtasks (optional):</Text>
-                    {subtasks && subtasks.map((item: string, index: number) => (
-                        <TextInput 
-                            key={index} 
-                            mode={'outlined'} 
-                            label={'Subtask title'} 
-                            right={<TextInput.Icon icon={'trash-can-outline'} onPress={() => {
-                                if (subtasks.length <= 1) return;
-                                const temp = [...subtasks];
-                                temp.splice(index, 1);
-                                setSubtasks(temp);
-                            }} />} 
-                            value={item}
-                            onChangeText={(newVal) => {
-                                const temp = [...subtasks];
-                                temp[index] = newVal;
-                                setSubtasks(temp);
-                            }}  
-                            onFocus={() => {
-                                if (index === subtasks.length - 1) {
-                                  setTimeout(() => {
-                                    scrollRef.current?.scrollToEnd({ animated: true });
-                                  }, 300);
-                                }
-                              }}
-                        />
-                    ))}
-                    <Button 
-                        icon={'plus'} 
-                        style={{alignSelf: 'flex-end'}}
-                        onPress={() => {
-                            setSubtasks([...subtasks, '']);
-                            setTimeout(() => {
-                                scrollRef.current?.scrollToEnd({ animated: true });
-                              }, 100);
-                        }}
-                        disabled={subtasks[subtasks.length-1] === ''}
-                    >
-                        Add subtask
-                    </Button>
-                    </View>
-                </ScrollView>
-                
-                </KeyboardAvoidingView>
-                <View>
-                    <Divider />
-                    <Button onPress={saveTask}>Save task</Button>
+                <View style={{borderRadius: 19.5, borderColor: theme.colors.secondary, borderWidth: 2, width: '100%', flexDirection: 'row'}}>
+                    <Text style={{paddingVertical: 8, fontFamily: 'Nunito Sans', fontSize: 14, color: theme.colors.onSurface, textAlign: 'center', flex: 1}}>Easy</Text>
+                    <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
+                    <Text style={{paddingVertical: 8, fontFamily: 'Nunito Sans', fontSize: 14, fontWeight: 600, color: theme.colors.primary, textAlign: 'center', flex: 1, backgroundColor: theme.colors.secondary}}>Medium</Text>
+                    <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
+                    <Text style={{paddingVertical: 8, fontFamily: 'Nunito Sans', fontSize: 14, color: theme.colors.onSurface, textAlign: 'center', flex: 1}}>Hard</Text>
+                    <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
+                    <Text style={{paddingVertical: 8, fontFamily: 'Nunito Sans', fontSize: 14, color: theme.colors.onSurface, textAlign: 'center', flex: 1}}>Insane</Text>
                 </View>
             </View>
-            
         </SafeAreaView>
     )
 }

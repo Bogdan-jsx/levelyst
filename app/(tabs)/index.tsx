@@ -24,9 +24,9 @@ export default function TasksScreen() {
     }, []);
 
     return (
-        <SafeAreaView style={{backgroundColor: theme.colors.background, paddingTop: Platform.OS === 'android' ? insets.top + 12 : 0, flex: 1}}>
+        <SafeAreaView style={{backgroundColor: theme.colors.background, paddingTop: Platform.OS === 'android' ? insets.top + 8 : 8, flex: 1}}>
             <ScrollView>
-                <View style={{gap: 12, paddingBottom: 12, paddingHorizontal: 8}}>
+                <View style={{gap: 12, paddingBottom: 12}}>
                     <TasksSection name={TaskSectionNames.SINGLE_TIME} />
                     <TasksSection name={TaskSectionNames.REPEATABLE} />
                 </View>
