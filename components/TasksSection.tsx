@@ -102,7 +102,7 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                 </View>
                 
                 <View style={{width: '100%', height: 2, backgroundColor: theme.colors.secondary, marginTop: 8}} />
-                {undoneTasks && undoneTasks.map((item: any) => (
+                {undoneTasks?.length > 0 ? undoneTasks.map((item: any) => (
                     <View key={item.id} style={{borderBottomColor: theme.colors.secondary, borderBottomWidth: 2}}>
                         <View style={{flexDirection: 'row', gap: 16, justifyContent: 'space-between', maxWidth: '100%', marginTop: 16, marginHorizontal: 16}}>
                             <View style={{flex: 1}}>
@@ -126,7 +126,12 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                             <ExpandableSubtasksList task={item} onSubtaskDonePress={onSubtaskDonePress} />
                         ) : null}
                     </View>
-                ))}
+                )) : (
+                    <View style={{paddingVertical: 32, paddingHorizontal: 48, gap: 16}}>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 16, color: theme.colors.primary, textAlign: 'center'}}>Seems like you don’t have any {name === TaskSectionNames.REPEATABLE ? "repeatable" : "single-time"} tasks created.</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 16, color: theme.colors.primary, textAlign: 'center', fontWeight: 600}}>Start with creating one by pressing plus!</Text>
+                    </View>
+                )}
             </View>
         </>
     )

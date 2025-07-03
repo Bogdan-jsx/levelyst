@@ -13,7 +13,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function ShopScreen() {
     const theme = useTheme();
     const styles = useAnimatedTheme((theme as MD3Theme & {name: ThemeNames}).name)
-    console.log(styles)
     const insets = useSafeAreaInsets();
     const {themeName, changeThemeName} = useAppTheme();
 

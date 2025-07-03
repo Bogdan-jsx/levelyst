@@ -15,7 +15,6 @@ export const ExpandableSubtasksList = ({task, onSubtaskDonePress}: {task: any, o
     const opacity = useSharedValue(0);
 
     useEffect(() => {
-        console.log(isExpanded);
         if (isExpanded) {
             maxHeight.value = withTiming(contentHeight, { duration: 300 });
         } else {

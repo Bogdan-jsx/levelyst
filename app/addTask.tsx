@@ -59,9 +59,7 @@ export default function AddTask() {
     const scrollRef = useRef<ScrollView>(null);
 
     const saveTask = useCallback(async () => {
-        console.log('save 1', title, date, difficultyLevel)
         if (!title || !date || !difficultyLevel) return;
-        console.log('save 2')
         if (name === TaskSectionNames.SINGLE_TIME) {
             await addTask({title, expAmount: expAmounts[difficultyLevel], dueDate: date, badges: selectedBadges, subtasks: subtasks[0] !== '' ? subtasks : []}, false);
         } else {
