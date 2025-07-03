@@ -3,41 +3,20 @@ import { getAllTasks, toggleSubtaskDone, toggleTaskDone } from "@/db/queries/tas
 import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { useCallback, useState } from "react";
-import { LayoutAnimation, Platform, Pressable, Text, TouchableOpacity, UIManager, useWindowDimensions, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Modal, Portal, useTheme } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AddIcon from "../icons/add_icon.svg";
-import ArrowIcon from "../icons/down-arrow.svg";
 import Tick from "../icons/tick.svg";
+import { ExpandableSubtasksList } from "./ExpandableSubtasksList";
 
 export default function TasksSection({name}: {name: TaskSectionNames}) {
     const theme = useTheme()
-    const { height } = useWindowDimensions();
-    const insets = useSafeAreaInsets();
-    
-    const usableHeight = height - insets.top - insets.bottom - 84;
-    const halfHeight = usableHeight / 2;
 
     const [undoneTasks, setUndoneTasks] = useState<any>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [subtaskDialogVisible, setSubtaskDialogVisible] = useState<boolean>(false);
     const [taskItemId, setTaskItemId] = useState<any>();
     const [subtaskItemId, setSubtaskItemId] = useState<any>();
-    const [tasksWithExpandedSubtasks, setTasksWithExpandedSubtasks] = useState<number[]>([]);
-
-    if (Platform.OS === 'android') {
-        UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
-
-    const toggleExpandSubtasksForTask = useCallback((id: number) => {
-        const index = tasksWithExpandedSubtasks.indexOf(id);
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        if (index === -1) {
-            setTasksWithExpandedSubtasks([...tasksWithExpandedSubtasks, id]);
-        } else {
-            setTasksWithExpandedSubtasks(tasksWithExpandedSubtasks.toSpliced(index, 1));
-        }
-    }, [tasksWithExpandedSubtasks])
 
     const fetchData = useCallback(async () => {
         const temp: any = await getAllTasks(name)
@@ -144,27 +123,7 @@ export default function TasksSection({name}: {name: TaskSectionNames}) {
                             ))} 
                         </View>
                         {item?.subtasks?.length ? (
-                            <>
-                                <Pressable onPress={() => toggleExpandSubtasksForTask(item.id)} style={{flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', gap: 4, marginTop: 8, marginHorizontal: 16, marginBottom: 16, opacity: 1}}>
-                                    <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary}}>{tasksWithExpandedSubtasks.indexOf(item.id) !== -1 ? "Collapse" : "Expand"} {item.subtasks.length} subtasks</Text>
-                                    <ArrowIcon width={12} height={12} color={theme.colors.primary} style={{transform: tasksWithExpandedSubtasks.indexOf(item.id) !== -1 ? [{rotate: '180deg'}] : []}} />
-                                </Pressable>
-                                {/* {tasksWithExpandedSubtasks.indexOf(item.id) !== -1 ? ( */}
-                                {tasksWithExpandedSubtasks.indexOf(item.id) !== -1 ? (
-                                    <View style={{gap: 2, marginBottom: 4, overflow: 'hidden', maxHeight: 100000}}>
-                                        {item.subtasks.map((subtask: any) => (
-                                            <View key={subtask.id} style={{backgroundColor: theme.colors.secondary, padding: 16, flexDirection: 'row', maxWidth: '100%', justifyContent: 'space-between'}}>
-                                                <Text style={{color: subtask.done === 1 ? theme.colors.onSecondary : theme.colors.primary}}>{subtask.title}</Text>
-                                                <TouchableOpacity disabled={item.done === 1} onPress={() => onSubtaskDonePress(subtask, item)} style={{backgroundColor: theme.colors.surface, width: 16, height: 16, borderRadius: 8}}>
-                                                    {subtask.done === 1 && (
-                                                        <Tick width={16} height={11} style={{marginLeft: 2, marginTop: 1}} color={item.done === 1 ? theme.colors.onSecondary : theme.colors.primary} />
-                                                    )}
-                                                </TouchableOpacity>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ) : null}
-                            </>
+                            <ExpandableSubtasksList task={item} onSubtaskDonePress={onSubtaskDonePress} />
                         ) : null}
                     </View>
                 ))}

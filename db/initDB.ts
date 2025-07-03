@@ -10,14 +10,26 @@ export const initDB = async () => {
     // console.log(await db.getAllAsync("SELECt * FROM profile;"))
     // await db.runAsync("UPDATE tasks SET done = 0 WHERE id > 0")
     // await db.runAsync("UPDATE quests SET active = 0 WHERE id > 0")
-    // await db.runAsync("DROP TABLE IF EXISTS themes;")
+    // await db.runAsync("DROP TABLE IF EXISTS tasks;")
     await db.runAsync(`
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             exp_amount INTEGER DEFAULT 0,
             due_date_string TEXT,
+            created_at_date_string TEXT,
+            completed_at_date_string TEXT,
             done BOOLEAN DEFAULT false,
+            is_repeatable BOOLEAN,
+            is_expired BOOLEAN DEFAULT false,
+            task_sample_id INTEGER DEFAULT 0
+        );
+    `);
+    await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS task_samples (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            exp_amount INTEGER DEFAULT 0,
             repeat_every_days INTEGER
         );
     `);
@@ -33,6 +45,15 @@ export const initDB = async () => {
             badge_id INTEGER,
             PRIMARY KEY (task_id, badge_id),
             FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+            FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE
+        );
+    `)
+    await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS sample_badges (
+            sample_id INTEGER,
+            badge_id INTEGER,
+            PRIMARY KEY (task_id, badge_id),
+            FOREIGN KEY (task_id) REFERENCES task_samples(id) ON DELETE CASCADE,
             FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE
         );
     `)
