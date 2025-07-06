@@ -1,4 +1,4 @@
-import { getQuests } from "@/db/queries/quests";
+import { getQuests, updateQuestsStatus } from "@/db/queries/quests";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { Platform, SafeAreaView, ScrollView, Text, View } from "react-native";
@@ -13,6 +13,7 @@ export default function QuestsScreen() {
     const [weeklyQuests, setWeeklyQuests] = useState<any[]>([]);
 
     const fetchData = useCallback(async () => {
+        await updateQuestsStatus();
         const daily: any = await getQuests('daily')
         const weekly: any = await getQuests('weekly')
         setDailyQuests(daily);

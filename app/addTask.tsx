@@ -4,7 +4,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Appearance, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Button, Modal, Portal, useTheme } from "react-native-paper";
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AddIcon from "../icons/add_icon.svg";
 import DeleteIcon from "../icons/delete_icon.svg";
 import Tick from "../icons/tick.svg";
@@ -28,13 +27,12 @@ export default function AddTask() {
     const theme = useTheme();
     const {name} = useLocalSearchParams()
     const router = useRouter();
-    const insets = useSafeAreaInsets();
     const colorScheme = Appearance.getColorScheme();
 
     const [title, setTitle] = useState<string>("");
     const [date, setDate] = useState<Date>(new Date);
     const [dateOpen, setDateOpen] = useState<boolean>(false);
-    const [repeatEachDays, setRepeatEachDays] = useState<number>(1);
+    const [repeatEachDays, setRepeatEachDays] = useState<number>(0);
     const [difficultyLevel, setDifficultyLevel] = useState<Difficulties>(Difficulties.EASY);
     const [badges, setBadges] = useState<{name: string, id: number}[]>([]);
     const [selectedBadges, setSelectedBadges] = useState<number[]>([]);
@@ -59,7 +57,7 @@ export default function AddTask() {
     const scrollRef = useRef<ScrollView>(null);
 
     const saveTask = useCallback(async () => {
-        if (!title || !date || !difficultyLevel) return;
+        if (!title || !difficultyLevel || ((!date && name === TaskSectionNames.SINGLE_TIME) || (!repeatEachDays && name === TaskSectionNames.REPEATABLE))) return;
         if (name === TaskSectionNames.SINGLE_TIME) {
             await addTask({title, expAmount: expAmounts[difficultyLevel], dueDate: date, badges: selectedBadges, subtasks: subtasks[0] !== '' ? subtasks : []}, false);
         } else {
@@ -103,7 +101,7 @@ export default function AddTask() {
                                 </TouchableOpacity>
                             </View>
                         ) : (
-                            <TextInput placeholder='Repeat once in ... days'  placeholderTextColor={theme.colors.secondary} style={{paddingVertical: 8, paddingHorizontal: 16, borderColor: theme.colors.secondary, borderWidth: 2, borderRadius: 18.5}} onChangeText={(newVal) => {
+                            <TextInput value={String(repeatEachDays || '')} placeholder='Repeat once in ... days'  placeholderTextColor={theme.colors.secondary} style={{paddingVertical: 8, paddingHorizontal: 16, borderColor: theme.colors.secondary, borderWidth: 2, borderRadius: 18.5}} onChangeText={(newVal) => {
                                 const numeric = newVal.replace(/[^0-9]/g, '');
                                 setRepeatEachDays(Number(numeric));
                             }} />
@@ -111,19 +109,19 @@ export default function AddTask() {
                         
                         <View style={{borderRadius: 19.5, borderColor: theme.colors.secondary, borderWidth: 2, width: '100%', flexDirection: 'row', overflow: 'hidden'}}>
                             <TouchableOpacity style={{paddingVertical: 8, flex: 1, backgroundColor: difficultyLevel === Difficulties.EASY ? theme.colors.secondary : 'none'}} onPress={() => setDifficultyLevel(Difficulties.EASY)}>
-                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.MEDIUM ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center'}}>Easy</Text>
+                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.EASY ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center', fontWeight: difficultyLevel === Difficulties.EASY ? 600 : 400}}>Easy</Text>
                             </TouchableOpacity>
                             <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
                             <TouchableOpacity style={{paddingVertical: 8, flex: 1, backgroundColor: difficultyLevel === Difficulties.MEDIUM ? theme.colors.secondary : 'none'}} onPress={() => setDifficultyLevel(Difficulties.MEDIUM)}>
-                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.MEDIUM ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center'}}>Medium</Text>
+                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.MEDIUM ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center', fontWeight: difficultyLevel === Difficulties.MEDIUM ? 600 : 400}}>Medium</Text>
                             </TouchableOpacity>
                             <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
                             <TouchableOpacity style={{paddingVertical: 8, flex: 1, backgroundColor: difficultyLevel === Difficulties.HARD ? theme.colors.secondary : 'none'}} onPress={() => setDifficultyLevel(Difficulties.HARD)}>
-                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.MEDIUM ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center'}}>Hard</Text>
+                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.HARD ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center', fontWeight: difficultyLevel === Difficulties.HARD ? 600 : 400}}>Hard</Text>
                             </TouchableOpacity>
                             <View style={{width: 2, height: '100%', backgroundColor: theme.colors.secondary}} />
                             <TouchableOpacity style={{paddingVertical: 8, flex: 1, backgroundColor: difficultyLevel === Difficulties.INSANE ? theme.colors.secondary : 'none'}} onPress={() => setDifficultyLevel(Difficulties.INSANE)}>
-                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.MEDIUM ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center'}}>Insane</Text>
+                                <Text style={{fontFamily: 'Nunito Sans',  fontSize: 14, color: difficultyLevel === Difficulties.INSANE ? theme.colors.primary : theme.colors.onSurface,  textAlign: 'center', fontWeight: difficultyLevel === Difficulties.INSANE ? 600 : 400}}>Insane</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{gap: 8, flexDirection: 'row', flexWrap: 'wrap'}}>

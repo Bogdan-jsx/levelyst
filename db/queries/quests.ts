@@ -2,6 +2,7 @@ import { getDayOfYear, getWeek } from "date-fns";
 import dailyQuests from "../dailyQuestsConfig.json";
 import db from "../db";
 import weeklyQuests from "../weeklyQuestsConfig.json";
+import { getAllStats } from "./stats";
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
@@ -50,9 +51,12 @@ export const setActiveQuests = async (type: 'daily' | 'weekly') => {
 export const updateQuestsStatus = async () => {
     try {
         const activeQuests: any[] = await db.getAllAsync("SELECT * FROM quests WHERE active = 1 AND done = 0;");
-        const profile: any = await db.getFirstAsync("SELECT * FROM profile;")
+        
+        const weeklyStats: any = await getAllStats('weekly');
+        const dailyStats: any = await getAllStats('daily');
+
         for (const quest of activeQuests) {
-            quest.progress = profile[quest.related_to_field];
+            quest.progress = quest.type === 'daily' ? dailyStats[quest.related_to_field] : weeklyStats[quest.related_to_field];
             if (quest.progress >= quest.goal) {
                 quest.done = 1;
                 quest.progress = quest.goal;

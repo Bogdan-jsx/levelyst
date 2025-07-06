@@ -10,7 +10,7 @@
         "reward": 0,
         "min_goal": 14,
         "max_goal": 28, 
-        "related_to_field": "completed_tasks_weekly"
+        "related_to_field": "completedTasks"
     },
     {
         "template": "Complete *template* task(s) of insane level",
@@ -23,7 +23,7 @@
         "reward": 0,
         "min_goal": 1,
         "max_goal": 2, 
-        "related_to_field": "completed_insane_tasks_weekly"
+        "related_to_field": "completedInsaneLevelTasks"
     },
     {
         "template": "Complete *template* tasks of hard level",
@@ -36,7 +36,7 @@
         "reward": 0,
         "min_goal": 3,
         "max_goal": 10, 
-        "related_to_field": "completed_hard_tasks_weekly"
+        "related_to_field": "completedHardLevelTasks"
     },
     {
         "template": "Gain *template* experience",
@@ -49,6 +49,6 @@
         "reward": 0,
         "min_goal": 300,
         "max_goal": 1000, 
-        "related_to_field": "exp_gained_weekly"
+        "related_to_field": "experienceGained"
     }
 ]

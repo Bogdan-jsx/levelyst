@@ -1,7 +1,8 @@
 import { changeUsername, getProfile } from "@/db/queries/profile";
+import { getAllStats } from "@/db/queries/stats";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Dimensions, Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfileIcon from "../../icons/profile_icon.svg";
@@ -9,9 +10,9 @@ import ProfileIcon from "../../icons/profile_icon.svg";
 export default function TasksScreen() {
     const theme = useTheme();
     const insets = useSafeAreaInsets();
-    const screenWidth = Dimensions.get('window').width;
 
     const [profile, setProfile] = useState<any>();
+    const [stats, setStats] = useState<any>();
     const [progress, setProgress] = useState<number>(0)
     const [isChangingUsername, setIsChangingUsername] = useState<boolean>(false);
     const [username, setUsername] = useState<string>('');
@@ -25,6 +26,8 @@ export default function TasksScreen() {
     const fetchData = useCallback(async () => {
         const temp: any = await getProfile()
         setProfile(temp);
+        const tempStats: any = await getAllStats('weekly');
+        setStats(tempStats);
     }, [])
     
     useFocusEffect(
@@ -77,39 +80,39 @@ export default function TasksScreen() {
                     <View style={{width: '100%', height: 2, backgroundColor: theme.colors.secondary, marginTop: 8}} />
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Completed tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{profile?.completed_singletime_tasks_weekly + profile?.completed_repeatable_tasks_weekly}</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.completedTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Completed single-time tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{profile?.completed_singletime_tasks_weekly}</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.completedSingleTimeTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Completed repeatable tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{profile?.completed_repeatable_tasks_weekly}</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.completedRepeatableTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Completed hard-level tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>0</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.completedHardLevelTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Completed insane-level tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{profile?.completed_insane_tasks_weekly}</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.completedInsaneLevelTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Experience gained</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{profile?.exp_gained_weekly}</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.experienceGained | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Expired tasks</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>0</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.expiredTasks | 0}</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Tasks completion in time percentage</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>0</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.tasksCompletedInTimePercentage | 0}%</Text>
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 16}}>
                         <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.onBackground}}>Average completed tasks per day</Text>
-                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>0</Text>
+                        <Text style={{fontFamily: "Nunito Sans", fontSize: 12, color: theme.colors.primary, fontWeight: 600}}>{stats?.averageCompletedTasksDaily | 0}</Text>
                     </View>
                 </View>
             </ScrollView>

@@ -17,45 +17,18 @@ export const initProfile = async (nickname: string) => {
     }
 }
 
-export const checkAndResetWeeklyStats = async () => {
+export const checkWeekDayNumber = async () => {
     try {
+        const dayNumber = getDayOfYear(new Date());
         const weekNumber = getWeek(new Date(), {
             weekStartsOn: 1
         });
-        const user: any = await db.getFirstAsync("SELECT * FROM profile;");
-        if (user.saved_week_number !== weekNumber) {
-            await db.runAsync(`
-                UPDATE profile
-                SET completed_singletime_tasks_weekly = 0,
-                completed_repeatable_tasks_weekly = 0,
-                completed_insane_tasks_weekly = 0,
-                completed_hard_tasks_weekly = 0,
-                exp_gained_weekly = 0,
-                achievements_gained_weekly = 0,
-                completed_tasks_weekly = 0,
-                saved_week_number = $newWeekNum
-            `, {$newWeekNum: weekNumber})
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
 
-export const checkAndResetDailyStats = async () => {
-    try {
-        const dayNumber = getDayOfYear(new Date());
-        const user: any = await db.getFirstAsync("SELECT * FROM profile;");
-        if (user.saved_day_number !== dayNumber) {
-            await db.runAsync(`
-                UPDATE profile
-                SET completed_tasks_daily = 0,
-                completed_singletime_tasks_daily = 0,
-                completed_repeatable_tasks_daily = 0,
-                completed_hard_tasks_daily = 0,
-                exp_gained_daily = 0,
-                saved_day_number = $newDayNum
-            `, {$newDayNum: dayNumber})
-        }
+        await db.runAsync(`
+            UPDATE profile
+            SET saved_day_number = $newDayNum,
+            saved_week_number = $newWeekNum
+        `, {$newDayNum: dayNumber, $newWeekNum: weekNumber})
     } catch (error) {
         console.log(error);
     }
