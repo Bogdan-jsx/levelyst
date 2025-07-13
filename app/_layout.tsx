@@ -1,7 +1,7 @@
 import { CustomAddTaskHeader } from "@/components/CustomAddTaskHeader";
+import { ThemeNames, themes } from "@/config/themesConfig";
 import { initDB } from "@/db/initDB";
 import { ThemeProvider, useAppTheme } from "@/theme/ThemeContext";
-import { ThemeNames, themes } from "@/theme/themesConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
@@ -41,6 +41,7 @@ const MainApp = () => {
   async function loadFonts() {
     await Font.loadAsync({
       'Nunito Sans': require('../assets/fonts/NunitoSans.ttf'),
+      'Nunito Sans Semibold': require('../assets/fonts/NunitoSans-SemiBold.ttf')
     });
   }
 

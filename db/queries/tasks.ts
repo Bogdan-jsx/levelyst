@@ -1,28 +1,10 @@
-import { TaskSectionNames } from "@/app/(tabs)";
+import { TaskSectionNames } from "@/app/(tabs)/index";
+import { AddBadge, AddTask, AddTaskSample, Badge, Subtask, Task, TaskSample } from "@/types/tasks";
 import db from "../db";
 
-interface Task {
-    title: string,
-    expAmount: number,
-    dueDate: Date,
-    subtasks: string[],
-    badges: number[],
-    taskSampleId?: number
-}
 
-interface TaskSample {
-    title: string,
-    expAmount: number,
-    repeatEachDays: number,
-    subtasks: string[],
-    badges: number[],
-}
 
-interface Badge {
-    name: string,
-}
-
-export const addTask = async (task: Task, isRepeatable: boolean) => {
+export const addTask = async (task: AddTask, isRepeatable: boolean) => {
     try {
         const result = await db.runAsync("INSERT INTO tasks (title, exp_amount, due_date_string, created_at_date_string, completed_at_date_string, is_repeatable, task_sample_id) VALUES ($title, $exp_amount, $due_date_string, $created_at_date_string, $completed_at_date_string, $is_repeatable, $task_sample_id);", 
             {$title: task.title, $exp_amount: task.expAmount, $due_date_string: task.dueDate.toLocaleDateString(), $created_at_date_string: new Date().toLocaleDateString(), $completed_at_date_string: '', $is_repeatable: isRepeatable, $task_sample_id: task.taskSampleId || 0});
@@ -30,7 +12,6 @@ export const addTask = async (task: Task, isRepeatable: boolean) => {
             await db.runAsync(`INSERT INTO subtasks (title, task_id) VALUES ${task.subtasks.map((item: string) => `("${item}", ${result.lastInsertRowId})`).join(', ')}`);
         }
         if (task?.badges?.length > 0) {
-            console.log(`INSERT INTO tasks_badges (task_id, badge_id) VALUES ${task.badges.map((item: number) => `(${result.lastInsertRowId}, ${item})`).join(', ')}`)
             await db.runAsync(`INSERT INTO tasks_badges (task_id, badge_id) VALUES ${task.badges.map((item: number) => `(${result.lastInsertRowId}, ${item})`).join(', ')}`);
         }
     } catch (error) {
@@ -38,7 +19,7 @@ export const addTask = async (task: Task, isRepeatable: boolean) => {
     }   
 }
 
-export const addTaskSample = async (sample: TaskSample) => {
+export const addTaskSample = async (sample: AddTaskSample) => {
     try {
         const result = await db.runAsync("INSERT INTO task_samples (title, exp_amount, repeat_every_days) VALUES ($title, $exp_amount, $repeat_every_days);", 
             {$title: sample.title, $exp_amount: sample.expAmount, $repeat_every_days: sample.repeatEachDays});
@@ -46,7 +27,6 @@ export const addTaskSample = async (sample: TaskSample) => {
             await db.runAsync(`INSERT INTO subtasks (title, task_id) VALUES ${sample.subtasks.map((item: string) => `("${item}", ${result.lastInsertRowId})`).join(', ')}`);
         }
         if (sample?.badges?.length > 0) {
-            console.log(`INSERT INTO sample_badges (sample_id, badge_id) VALUES ${sample.badges.map((item: number) => `(${result.lastInsertRowId}, ${item})`).join(', ')}`)
             await db.runAsync(`INSERT INTO sample_badges (sample_id, badge_id) VALUES ${sample.badges.map((item: number) => `(${result.lastInsertRowId}, ${item})`).join(', ')}`);
         }
         const newTaskDate = new Date();
@@ -59,7 +39,7 @@ export const addTaskSample = async (sample: TaskSample) => {
 
 export const getAllTasks = async (type: TaskSectionNames) => {
     try {
-        const tasks: any[] = await db.getAllAsync(`
+        const tasks: Task[] = await db.getAllAsync(`
             SELECT * 
             FROM tasks 
             WHERE is_repeatable = ${type === TaskSectionNames.REPEATABLE ? 1 : 0} ${type === TaskSectionNames.REPEATABLE ? "AND is_expired = 0" : "AND done = 0"}
@@ -77,6 +57,7 @@ export const getAllTasks = async (type: TaskSectionNames) => {
         return tasks;
     } catch (error) {
        console.log(error);
+       return [];
     }
 }
 
@@ -86,6 +67,13 @@ export const toggleTaskDone = async (newValue: number, id: number, setSubtasks: 
         if (setSubtasks) {
             await db.runAsync(`UPDATE subtasks SET done = $newValue WHERE task_id = $id`, {$id: id, $newValue: newValue})
         }
+        if (newValue === 1) {
+            const task: Task | null = await db.getFirstAsync("SELECT * FROM tasks WHERE id = $id;", {$id: id});
+
+            if (task === null) return;
+
+            await db.runAsync("UPDATE profile SET exp_gained = exp_gained + $expAmount;", {$expAmount: task.exp_amount})
+        }
     } catch (error) {
         console.log(error)
     }
@@ -94,7 +82,7 @@ export const toggleTaskDone = async (newValue: number, id: number, setSubtasks: 
 export const toggleSubtaskDone = async (newValue: number, id: number, taskId: number) => {
     try {
         await db.runAsync(`UPDATE subtasks SET done = $newValue WHERE id = $id;`, {$newValue: newValue, $id: id})
-        const subtasksUndone = await db.getAllAsync("SELECT * FROM subtasks WHERE task_id = $taskId AND done = 0;", {$taskId: taskId});
+        const subtasksUndone: Subtask[] = await db.getAllAsync("SELECT * FROM subtasks WHERE task_id = $taskId AND done = 0;", {$taskId: taskId});
         if (subtasksUndone.length > 0) {
             await toggleTaskDone(0, taskId, false);
         } else {
@@ -105,7 +93,7 @@ export const toggleSubtaskDone = async (newValue: number, id: number, taskId: nu
     }
 }
 
-export const addBadge = async (badge: Badge) => {
+export const addBadge = async (badge: AddBadge) => {
     try {
         await db.runAsync("INSERT INTO badges (name) VALUES ($name)", {$name: badge.name});
     } catch (error) {
@@ -115,7 +103,7 @@ export const addBadge = async (badge: Badge) => {
 
 export const getAllBadges = async () => {
     try {
-        const result = await db.getAllAsync("SELECT * FROM badges;")
+        const result: Badge[] = await db.getAllAsync("SELECT * FROM badges;")
         return result;
     } catch (error) {
         console.log(error);
@@ -124,9 +112,9 @@ export const getAllBadges = async () => {
 
 export const relaunchRepeatableTask = async (sampleId: number) => {
     try {
-        const sample: any = await db.getFirstAsync("SELECT * FROM task_samples WHERE id = $id;", {$id: sampleId})
-        const latestTask: any = await db.getFirstAsync("SELECT * FROM tasks WHERE task_sample_id = $id ORDER BY due_date_string;", {$id: sampleId});
-        if (!latestTask) return;
+        const sample: TaskSample | null = await db.getFirstAsync("SELECT * FROM task_samples WHERE id = $id;", {$id: sampleId})
+        const latestTask: Task | null = await db.getFirstAsync("SELECT * FROM tasks WHERE task_sample_id = $id ORDER BY due_date_string;", {$id: sampleId});
+        if (!latestTask || !sample) return;
         if (latestTask?.done === 0) {
             await db.runAsync("UPDATE tasks SET is_expired = 1 WHERE id = $id;", {$id: latestTask.id})
         }
@@ -149,8 +137,8 @@ export const relaunchRepeatableTask = async (sampleId: number) => {
             title: sample.title, 
             expAmount: sample.exp_amount, 
             dueDate: newTaskDueDate, 
-            subtasks: sample.subtasks.map((item: any) => item.title), 
-            badges: sample.badges.map((item: any) => item.id),
+            subtasks: sample.subtasks.map((item: Subtask) => item.title), 
+            badges: sample.badges.map((item: Badge) => item.id),
             taskSampleId: sample.id}, 
             true)
     } catch (error) {
@@ -160,9 +148,9 @@ export const relaunchRepeatableTask = async (sampleId: number) => {
 
 export const relaunchRepeatableTasks = async () => {
     try {
-        const repeatableTasksSamples: any = await db.getAllAsync("SELECT * FROM task_samples;");
+        const repeatableTasksSamples: TaskSample[] = await db.getAllAsync("SELECT * FROM task_samples;");
         for (const sample of repeatableTasksSamples) {  
-            const latestTask: any = await db.getFirstAsync("SELECT * FROM tasks WHERE task_sample_id = $id ORDER BY due_date_string;", {$id: sample.id});
+            const latestTask: Task | null = await db.getFirstAsync("SELECT * FROM tasks WHERE task_sample_id = $id ORDER BY due_date_string;", {$id: sample.id});
             if (!latestTask) continue;
             if (new Date(latestTask.due_date_string) < new Date()) {
                 await relaunchRepeatableTask(sample.id)

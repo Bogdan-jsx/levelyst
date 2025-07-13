@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
-import { ThemeNames } from "./themesConfig";
+import { ThemeNames } from "../config/themesConfig";
 
 
 const ThemeContext = createContext({themeName: 'light'} as any);

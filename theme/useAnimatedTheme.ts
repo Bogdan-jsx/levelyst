@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { ThemeNames, themes } from './themesConfig';
+import { ThemeNames, themes } from '../config/themesConfig';
 
 const themeKeys = Object.keys(themes);
 

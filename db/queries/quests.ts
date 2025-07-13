@@ -1,7 +1,9 @@
+import { Quest, QuestType } from "@/types/quests";
+import { Stats } from "@/types/stats";
 import { getDayOfYear, getWeek } from "date-fns";
-import dailyQuests from "../dailyQuestsConfig.json";
+import dailyQuests from "../../config/dailyQuestsConfig.json";
+import weeklyQuests from "../../config/weeklyQuestsConfig.json";
 import db from "../db";
-import weeklyQuests from "../weeklyQuestsConfig.json";
 import { getAllStats } from "./stats";
 
 function getRandomInt(min: number, max: number) {
@@ -22,15 +24,18 @@ export const initQuests = async () => {
     }
 }
 
-export const setActiveQuests = async (type: 'daily' | 'weekly') => {
+export const setActiveQuests = async (type: QuestType) => {
     try {
-        const quests: object[] = await db.getAllAsync("SELECT * FROM quests WHERE type = $type;", {$type: type});
+        await db.runAsync("UPDATE quests SET active = 0 WHERE type = $type;", {$type: type});
+
+        const quests: Quest[] = await db.getAllAsync("SELECT * FROM quests WHERE type = $type;", {$type: type});
+
         for (let i = 0; i < 3; i++) {
             const index = getRandomInt(0, quests.length-1);
-            const quest: any = {...quests[index]};
+            const quest: Quest = {...quests[index]};
             quests.splice(index, 1);
             quest.goal = getRandomInt(quest.min_goal, quest.max_goal);
-            quest.title = quest.template.replace('*template*', quest.goal);
+            quest.title = quest.template.replace('*template*', String(quest.goal));
             quest.reward = Math.round(quest.basic_reward * quest.goal);
             await db.runAsync(`
                 UPDATE quests
@@ -50,13 +55,15 @@ export const setActiveQuests = async (type: 'daily' | 'weekly') => {
 
 export const updateQuestsStatus = async () => {
     try {
-        const activeQuests: any[] = await db.getAllAsync("SELECT * FROM quests WHERE active = 1 AND done = 0;");
+        const activeQuests: Quest[] = await db.getAllAsync("SELECT * FROM quests WHERE active = 1 AND done = 0;");
         
-        const weeklyStats: any = await getAllStats('weekly');
-        const dailyStats: any = await getAllStats('daily');
+        const weeklyStats: Stats | null = await getAllStats('weekly');
+        const dailyStats: Stats | null = await getAllStats('daily');
+
+        if (!dailyStats || !weeklyStats) return;
 
         for (const quest of activeQuests) {
-            quest.progress = quest.type === 'daily' ? dailyStats[quest.related_to_field] : weeklyStats[quest.related_to_field];
+            quest.progress = quest.type === 'daily' ? dailyStats[quest.related_to_field as keyof Stats] : weeklyStats[quest.related_to_field as keyof Stats];
             if (quest.progress >= quest.goal) {
                 quest.done = 1;
                 quest.progress = quest.goal;
@@ -71,7 +78,10 @@ export const updateQuestsStatus = async () => {
 
 export const resetQuests = async () => {
     try {
-        const profile: any = await db.getFirstAsync("SELECT saved_week_number, saved_day_number FROM profile;");
+        const profile: {saved_week_number: number, saved_day_number: number} | null = await db.getFirstAsync("SELECT saved_week_number, saved_day_number FROM profile;");
+
+        if (profile === null) return;
+
         const activeDailyQuests = await db.getAllAsync("SELECT * FROM quests WHERE type = 'daily' AND active = 1;");
         const activeWeeklyQuests = await db.getAllAsync("SELECT * FROM quests WHERE type = 'weekly' AND active = 1;");
         const weekNumber = getWeek(new Date(), {
@@ -92,11 +102,12 @@ export const resetQuests = async () => {
     }
 }
 
-export const getQuests = async (type: 'daily' | 'weekly') => {
+export const getQuests = async (type: QuestType) => {
     try {
-        const result = await db.getAllAsync("SELECT * FROM quests WHERE active = 1 AND type = $type;", {$type: type});
+        const result: Quest[] = await db.getAllAsync("SELECT * FROM quests WHERE active = 1 AND type = $type;", {$type: type});
         return result;
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return [];
     }
 }

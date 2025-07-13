@@ -1,17 +1,7 @@
+import { AddTheme, ThemeItem } from "@/types/themes";
 import db from "../db";
 
-interface Theme {
-    name: string,
-    title: string,
-    primary: string,
-    secondary: string,
-    surface: string,
-    onSurface: string,
-    background: string,
-    price: number,
-}
-
-export const addTheme = async (theme: Theme) => {
+export const addTheme = async (theme: AddTheme) => {
     try {
         await db.runAsync(`
             INSERT INTO themes 
@@ -25,10 +15,11 @@ export const addTheme = async (theme: Theme) => {
 
 export const getThemes = async () => {
     try {
-        const result = await db.getAllAsync("SELECT * FROM themes;");
+        const result: ThemeItem[] = await db.getAllAsync("SELECT * FROM themes;");
         return result;
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return [];
     }
 }
 

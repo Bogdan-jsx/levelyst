@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "levelyst",
+    "name": "Levelyst",
     "slug": "levelyst",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "levelyst",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,10 +13,7 @@
       "bundleIdentifier": "com.anonymous.levelyst"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
+      "icon": "./assets/images/app-icon.png",
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.levelyst"
     },
@@ -41,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6772d6c7-9df3-4999-92e2-e115ab1622bb"
+      }
+    },
+    "owner": "a1t"
   }
 }

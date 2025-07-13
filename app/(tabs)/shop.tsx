@@ -1,28 +1,31 @@
+import { ThemeNames } from "@/config/themesConfig";
 import { getProfile } from "@/db/queries/profile";
 import { buyTheme, getThemes } from "@/db/queries/themes";
 import { useAppTheme } from "@/theme/ThemeContext";
-import { ThemeNames } from "@/theme/themesConfig";
 import { useAnimatedTheme } from "@/theme/useAnimatedTheme";
+import { Profile } from "@/types/profile";
+import { ThemeItem } from "@/types/themes";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { LayoutAnimation, Platform, SafeAreaView, ScrollView, TouchableOpacity, View } from "react-native";
+import { LayoutAnimation, Platform, ScrollView, StyleSheet } from "react-native";
 import { MD3Theme, useTheme } from "react-native-paper";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ShopContainer, ShopHeaderContainer, ThemeButton, ThemeDescriptionContainer, ThemePreviewItem, ThemePreviewWrapper, Wrapper } from "../tabsStyles/shop.styled";
 
 export default function ShopScreen() {
     const theme = useTheme();
-    const styles = useAnimatedTheme((theme as MD3Theme & {name: ThemeNames}).name)
+    const animatedStyles = useAnimatedTheme((theme as MD3Theme & {name: ThemeNames}).name)
     const insets = useSafeAreaInsets();
     const {themeName, changeThemeName} = useAppTheme();
 
-    const [themes, setThemes] = useState<any[]>([]);
-    const [profile, setProfile] = useState<any>();
+    const [themes, setThemes] = useState<ThemeItem[]>([]);
+    const [profile, setProfile] = useState<Profile | null>();
 
     const fetchData = useCallback(async () => {
-        const result: any = await getThemes();
+        const result: ThemeItem[] = await getThemes();
         setThemes(result)
-        const resultProfile: any = await getProfile()
+        const resultProfile: Profile | null = await getProfile()
         setProfile(resultProfile);
     }, [])
 
@@ -32,41 +35,40 @@ export default function ShopScreen() {
         }, [fetchData])
     )
 
-    const shouldDisableBtn = useCallback((item: any) => {
+    const shouldDisableBtn = useCallback((item: ThemeItem) => {
         if (item.is_owned && item.name === themeName) return true;
-        if (!item.is_owned && profile?.coins < item.price) return true;
+        if (!item.is_owned && (profile?.coins || 0) < item.price) return true;
         return false;
     }, [profile?.coins, themeName])
 
     return (
-        <SafeAreaView style={{backgroundColor: theme.colors.background, flex: 1, paddingTop: Platform.OS === 'android' ? insets.top + 12 : 0}}>
-            <Animated.View style={[{flex: 1}, styles.backgroundBackgroundColor]}>
+        <Wrapper bgColor={theme.colors.background} paddingTop={Platform.OS === 'android' ? insets.top + 12 : 0}>
+            <Animated.View style={[styles.flex, animatedStyles.backgroundBackgroundColor]}>
                 <ScrollView>
-                    <View style={{paddingVertical: 32}}>
-                        <View style={{paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Animated.Text style={[{fontFamily: "Nunito Sans", fontSize: 14}, styles.onBackgroundColor]}>Themes</Animated.Text>
-                            <Animated.Text style={[{fontFamily: "Nunito Sans", fontSize: 14, fontWeight: 600, marginLeft: 16}, styles.primaryColor]}>{profile?.coins} coins</Animated.Text>
-                        </View>
-                        <Animated.View style={[{width: '100%', height: 2, marginTop: 8}, styles.backgroundColorSecondary]} />
+                    <ShopContainer>
+                        <ShopHeaderContainer>
+                            <Animated.Text style={[styles.themesText, animatedStyles.onBackgroundColor]}>Themes</Animated.Text>
+                            <Animated.Text style={[styles.coinsText, animatedStyles.primaryColor]}>{profile?.coins} coins</Animated.Text>
+                        </ShopHeaderContainer>
+                        <Animated.View style={[styles.divider, animatedStyles.backgroundColorSecondary]} />
                         {themes && themes.map((item) => (
-                            <Animated.View key={item.id} style={[{marginTop: 24, width: '100%', paddingHorizontal: 16, gap: 16, flexDirection: 'row'}, styles.backgroundColorSecondary]}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <View style={{width: 32, height: "100%", backgroundColor: item.primary_color}} />
-                                    <View style={{width: 32, height: "100%", backgroundColor: item.surface_color}} />
-                                    <View style={{width: 32, height: "100%", backgroundColor: item.secondary_color}} />
-                                    <View style={{width: 32, height: "100%", backgroundColor: item.background_color}} />
-                                    <View style={{width: 32, height: "100%", backgroundColor: item.on_surface_color}} />
-                                </View>
-                                <View style={{paddingVertical: 16}}>
-                                    <Animated.Text style={[{fontFamily: "Nunito Sans", fontSize: 14}, styles.primaryColor]}>{item.title}</Animated.Text>
-                                    <Animated.Text style={[{fontFamily: "Nunito Sans", fontSize: 12, fontWeight: 600, marginTop: 4}, styles.onBackgroundColor]}>{item.price} coins</Animated.Text>
-                                    <TouchableOpacity 
-                                        style={{marginTop: 16}}
+                            <Animated.View key={item.id} style={[styles.themesContainer, animatedStyles.backgroundColorSecondary]}>
+                                <ThemePreviewWrapper>
+                                    <ThemePreviewItem bgColor={item.primary_color} />
+                                    <ThemePreviewItem bgColor={item.surface_color} />
+                                    <ThemePreviewItem bgColor={item.secondary_color} />
+                                    <ThemePreviewItem bgColor={item.background_color} />
+                                    <ThemePreviewItem bgColor={item.on_surface_color} />
+                                </ThemePreviewWrapper>
+                                <ThemeDescriptionContainer>
+                                    <Animated.Text style={[styles.themesText, animatedStyles.primaryColor]}>{item.title}</Animated.Text>
+                                    <Animated.Text style={[styles.priceText, animatedStyles.onBackgroundColor]}>{item.price} coins</Animated.Text>
+                                    <ThemeButton 
                                         disabled={shouldDisableBtn(item)} 
                                         onPress={() => {
                                             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                                             if (!item.is_owned) {
-                                                if (profile.coins > item.price) {
+                                                if ((profile?.coins || 0) > item.price) {
                                                     buyTheme(item.id, item.price);
                                                     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                                                     changeThemeName(item.name as ThemeNames);
@@ -76,14 +78,50 @@ export default function ShopScreen() {
                                                 changeThemeName(item.name as ThemeNames)
                                             }
                                         }}>
-                                        <Animated.Text style={[{fontFamily: "Nunito Sans", fontSize: 12, fontWeight: shouldDisableBtn(item) ? 400 : 600}, shouldDisableBtn(item) ? styles.primaryContainerColor : styles.primaryColor]}>{item.is_owned ? themeName === item.name ? "Selected" : "Select" : "Buy"}</Animated.Text>
-                                    </TouchableOpacity>
-                                </View>
+                                        <Animated.Text style={[{fontFamily: shouldDisableBtn(item) ? "Nunito Sans" : "Nunito Sans Semibold"}, styles.btnText, shouldDisableBtn(item) ? animatedStyles.primaryContainerColor : animatedStyles.primaryColor]}>{item.is_owned ? themeName === item.name ? "Selected" : "Select" : "Buy"}</Animated.Text>
+                                    </ThemeButton>
+                                </ThemeDescriptionContainer>
                             </Animated.View>
                         ))}
-                    </View>
+                    </ShopContainer>
                 </ScrollView>
             </Animated.View>
-        </SafeAreaView>
+        </Wrapper>
     )
 }
+
+const styles = StyleSheet.create({
+    flex: {
+        flex: 1,
+    },
+    themesText: {
+        fontFamily: "Nunito Sans",
+        fontSize: 14,
+    },
+    coinsText: {
+        fontFamily: "Nunito Sans Semibold",
+        fontSize: 14,
+        marginLeft: 16
+    },
+    divider: {
+        width: "100%",
+        height: 2,
+        marginTop: 8,
+    },
+    themesContainer: {
+        marginTop: 24,
+        width: "100%",
+        paddingHorizontal: 16,
+        gap: 16,
+        flexDirection: 'row',
+    },
+    priceText: {
+        fontFamily: "Nunito Sans", 
+        fontSize: 12, 
+        fontWeight: 600, 
+        marginTop: 4
+    },
+    btnText: {
+        fontSize: 12
+    }
+})

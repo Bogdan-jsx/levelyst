@@ -1,3 +1,4 @@
+import { Profile } from '@/types/profile';
 import { getDayOfYear, getWeek } from 'date-fns';
 import db from "../db";
 
@@ -36,16 +37,19 @@ export const checkWeekDayNumber = async () => {
 
 export const getProfile = async () => {
     try {
-        const result = await db.getFirstAsync("SELECT * FROM profile;");
+        const result: Profile | null = await db.getFirstAsync("SELECT * FROM profile;");
         return result;
     } catch (error) {
         console.log(error);
+        return null;
     }
 }
 
 export const checkAndUpLevel = async () => {
     try {
-        const profile: any = await db.getFirstAsync("SELECT * FROM profile;");
+        const profile: Profile | null = await db.getFirstAsync("SELECT * FROM profile;");
+        if (profile === null) return;
+        
         if (profile.exp_gained >= profile.level * 150) {
             await db.runAsync("UPDATE profile SET level = level + 1, exp_gained = $newExpGained", {$newExpGained: profile.exp_gained - profile.level * 150})
         }
