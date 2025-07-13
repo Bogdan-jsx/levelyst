@@ -1,50 +1,40 @@
-# Welcome to your Expo app 👋
+# Levelyst
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Overview
 
-## Get started
+Basically it's a task manager for those who like gamified elements on mobile application. It provides users with both essentail to-do features like creating and marking tasks and gamification, such as daily and weekly quests. Users get coins for completing quests that can be spent in the shop. 
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- Creating, viewing and marking both single-time and repeatable tasks
+- Setting difficulty level and adding badges to tasks
+- Daily and weekly quests that gives coins when completed
+- Shop where user can spend coins 
+- Miltiple app color themes that can be bought in shop
+- Profile with weekly statistics of user
 
-2. Start the app
+## Technologies used
 
-   ```bash
-   npx expo start
-   ```
+- React Native
+- Expo 
+- Async Storage
+- React Native Reanimated
+- Expo SQLite
+- Typescript
 
-In the output, you'll find options to open the app in a
+## Screenshots
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+<table>
+  <tr>
+    <td><img src="./screenshots/dark_tasks.PNG" /></td>
+    <td><img src="./screenshots/dark_quests.PNG" /></td>
+    <td><img src="./screenshots/dark_shop.PNG" /></td>
+    <td><img src="./screenshots/dark_profile.PNG" /></td>
+  </tr>
+  <tr>
+    <td><img src="./screenshots/dark_add_task.PNG" /></td>
+    <td><img src="./screenshots/tasks_empty_state.PNG" /></td>
+    <td><img src="./screenshots/dark_theme.PNG" /></td>
+    <td><img src="./screenshots/blue_theme.PNG" /></td>
+  </tr>
+</table>

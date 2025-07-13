@@ -1,8 +1,8 @@
 import styled from "styled-components/native";
 
 
-export const HeaderWrapper = styled.SafeAreaView<{marginTop: number}>`
-    margin-top: ${props => props.marginTop}px;
+export const HeaderWrapper = styled.SafeAreaView<{paddingTop: number}>`
+    padding-top: ${props => props.paddingTop}px;
 `
 
 export const HeaderContainer = styled.View<{bgColor: string, borderColor: string, borderWidth: number}>`

@@ -35,7 +35,7 @@ export const NewLightTheme = {
 }
 
 export const NewDarkTheme = {
-    dark: false,
+    dark: true,
     name: ThemeNames.DARK,
     colors: {
         ...MD3LightTheme.colors,

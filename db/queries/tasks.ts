@@ -7,7 +7,7 @@ import db from "../db";
 export const addTask = async (task: AddTask, isRepeatable: boolean) => {
     try {
         const result = await db.runAsync("INSERT INTO tasks (title, exp_amount, due_date_string, created_at_date_string, completed_at_date_string, is_repeatable, task_sample_id) VALUES ($title, $exp_amount, $due_date_string, $created_at_date_string, $completed_at_date_string, $is_repeatable, $task_sample_id);", 
-            {$title: task.title, $exp_amount: task.expAmount, $due_date_string: task.dueDate.toLocaleDateString(), $created_at_date_string: new Date().toLocaleDateString(), $completed_at_date_string: '', $is_repeatable: isRepeatable, $task_sample_id: task.taskSampleId || 0});
+            {$title: task.title, $exp_amount: task.expAmount, $due_date_string: task.dueDate.toISOString().slice(0, 10), $created_at_date_string: new Date().toISOString().slice(0, 10), $completed_at_date_string: '', $is_repeatable: isRepeatable, $task_sample_id: task.taskSampleId || 0});
         if (task?.subtasks?.length > 0) {
             await db.runAsync(`INSERT INTO subtasks (title, task_id) VALUES ${task.subtasks.map((item: string) => `("${item}", ${result.lastInsertRowId})`).join(', ')}`);
         }
@@ -63,7 +63,7 @@ export const getAllTasks = async (type: TaskSectionNames) => {
 
 export const toggleTaskDone = async (newValue: number, id: number, setSubtasks: boolean = true) => {
     try {
-        await db.runAsync(`UPDATE tasks SET done = $newValue${newValue === 1 ? ", completed_at_date_string = '" + (new Date()).toLocaleDateString() + "'" : ""} WHERE id = $id`, {$id: id, $newValue: newValue})
+        await db.runAsync(`UPDATE tasks SET done = $newValue${newValue === 1 ? ", completed_at_date_string = '" + (new Date()).toISOString().slice(0, 10) + "'" : ""} WHERE id = $id`, {$id: id, $newValue: newValue})
         if (setSubtasks) {
             await db.runAsync(`UPDATE subtasks SET done = $newValue WHERE task_id = $id`, {$id: id, $newValue: newValue})
         }
@@ -163,7 +163,7 @@ export const relaunchRepeatableTasks = async () => {
 
 export const setTasksExpired = async () => {
     try {
-        await db.runAsync(`UPDATE tasks SET is_expired = 1 WHERE due_date_string < '${new Date().toLocaleDateString()}';`)
+        await db.runAsync(`UPDATE tasks SET is_expired = 1 WHERE due_date_string < '${new Date().toISOString().slice(0, 10)}';`)
     } catch (error) {
         console.log(error)
     }

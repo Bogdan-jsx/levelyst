@@ -114,8 +114,6 @@ export const initDB = async () => {
     await checkWeekDayNumber();
     await setTasksExpired();
 
-    // await db.runAsync("DELETE FROM themes;")
-
     const allThemes = await db.getAllAsync("SELECT * FROM themes;")
     if (allThemes.length <= 0) {
         for (const theme of themesForDB) {
@@ -123,6 +121,4 @@ export const initDB = async () => {
         }
         await db.runAsync("UPDATE themes SET is_owned = 1 WHERE name = 'dark' OR name = 'light';")
     }
-
-    // await db.runAsync("UPDATE profile SET coins = 100")
 }

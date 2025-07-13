@@ -6,10 +6,15 @@ import db from "../db";
 
 export const getAllStats = async (type: QuestType) => {
     try {
-        const completedTasks: CompletedTasksStats[] = await db.getAllAsync(`SELECT COUNT(*) as count, is_repeatable FROM tasks WHERE done = 1 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toLocaleDateString() : getFirstDayOfWeek().toLocaleDateString()}' GROUP BY is_repeatable;`);
-        const completedTasksByLevel: CompletedTasksByExpAmountStats[] = await db.getAllAsync(`SELECT COUNT(*) as count, exp_amount FROM tasks WHERE done = 1 AND exp_amount > 15 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toLocaleDateString() : getFirstDayOfWeek().toLocaleDateString()}' GROUP BY exp_amount;`);
-        const experienceGained: {expGained: number} | null = await db.getFirstAsync(`SELECT SUM(exp_amount) as expGained FROM tasks WHERE done = 1 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toLocaleDateString() : getFirstDayOfWeek().toLocaleDateString()}';`);
-        const expiredTasks: {count: number} | null = await db.getFirstAsync(`SELECT COUNT(*) as count FROM tasks WHERE is_expired = 1 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toLocaleDateString() : getFirstDayOfWeek().toLocaleDateString()}';`);
+        const completedTasks: CompletedTasksStats[] = await db.getAllAsync(`
+            SELECT COUNT(*) as count, is_repeatable 
+            FROM tasks 
+            WHERE done = 1 
+            AND completed_at_date_string > '${type === 'daily' ? (new Date()).toISOString().slice(0, 10) : getFirstDayOfWeek().toISOString().slice(0, 10)}'
+            GROUP BY is_repeatable;`);
+        const completedTasksByLevel: CompletedTasksByExpAmountStats[] = await db.getAllAsync(`SELECT COUNT(*) as count, exp_amount FROM tasks WHERE done = 1 AND exp_amount > 15 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toISOString().slice(0, 10) : getFirstDayOfWeek().toISOString().slice(0, 10)}' GROUP BY exp_amount;`);
+        const experienceGained: {expGained: number} | null = await db.getFirstAsync(`SELECT SUM(exp_amount) as expGained FROM tasks WHERE done = 1 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toISOString().slice(0, 10) : getFirstDayOfWeek().toISOString().slice(0, 10)}';`);
+        const expiredTasks: {count: number} | null = await db.getFirstAsync(`SELECT COUNT(*) as count FROM tasks WHERE is_expired = 1 AND completed_at_date_string >= '${type === 'daily' ? (new Date()).toISOString().slice(0, 10) : getFirstDayOfWeek().toISOString().slice(0, 10)}';`);
 
         const completedTasksTotal = completedTasks.reduce((acc: number, item: CompletedTasksStats) => acc + item.count, 0)
 

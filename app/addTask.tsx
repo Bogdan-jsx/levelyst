@@ -1,4 +1,5 @@
 import { RegularText, RegularTextBold } from '@/components/commonStyles';
+import { CustomAddTaskHeader } from '@/components/CustomAddTaskHeader';
 import { addTask, addTaskSample, getAllBadges } from '@/db/queries/tasks';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -74,7 +75,8 @@ export default function AddTask() {
     }, [date, difficultyLevel, name, repeatEachDays, router, selectedBadges, subtasks, title])
 
     return (
-        <Wrapper paddingBottom={insets.bottom}>
+        <Wrapper paddingBottom={insets.bottom} bgColor={theme.colors.background}>
+            <CustomAddTaskHeader />
             <Portal>
                 <Modal visible={dateOpen} onDismiss={() => setDateOpen(false)} contentContainerStyle={[Platform.OS === 'ios' ? {backgroundColor: colorScheme === 'dark' ? 'black' : 'white'} : {}, styles.modalStyles]}>
                     <DateTimePicker
@@ -94,7 +96,7 @@ export default function AddTask() {
                 <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.flex} keyboardVerticalOffset={Platform.OS === 'ios' ? 98 : 0}>
                     <ScrollView ref={scrollRef} style={styles.flex} contentContainerStyle={styles.scrollViewContainerStyle} keyboardShouldPersistTaps="handled">
                         <MainInfoContainer>
-                            <MainInput placeholder='Title...'  placeholderTextColor={theme.colors.secondary} borderColor={theme.colors.secondary} onChangeText={setTitle} />
+                            <MainInput placeholder='Title...'  placeholderTextColor={theme.colors.secondary} borderColor={theme.colors.secondary} onChangeText={setTitle} color={theme.colors.onBackground} />
                             {name === TaskSectionNames.SINGLE_TIME ? (
                                 <DueDate>
                                     <RegularText color={theme.colors.onBackground}>To complete until <RegularTextBold color={theme.colors.primary}>{date.toLocaleDateString()}</RegularTextBold></RegularText>
@@ -107,7 +109,7 @@ export default function AddTask() {
                                     </TouchableOpacity>
                                 </DueDate>
                             ) : (
-                                <MainInput value={String(repeatEachDays || '')} placeholder='Repeat once in ... days'  placeholderTextColor={theme.colors.secondary} borderColor={theme.colors.secondary} onChangeText={(newVal) => {
+                                <MainInput value={String(repeatEachDays || '')} placeholder='Repeat once in ... days'  placeholderTextColor={theme.colors.secondary} color={theme.colors.onBackground} borderColor={theme.colors.secondary} onChangeText={(newVal) => {
                                     const numeric = newVal.replace(/[^0-9]/g, '');
                                     setRepeatEachDays(Number(numeric));
                                 }} />
@@ -150,6 +152,7 @@ export default function AddTask() {
                                         placeholder='Subtask...'  
                                         placeholderTextColor={theme.colors.secondary} 
                                         borderColor={theme.colors.secondary}
+                                        color={theme.colors.onBackground} 
                                         value={item}
                                         onChangeText={(newVal) => {
                                             const temp = [...subtasks];

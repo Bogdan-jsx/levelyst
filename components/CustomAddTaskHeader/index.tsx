@@ -12,7 +12,7 @@ export const CustomAddTaskHeader = () => {
     const insets = useSafeAreaInsets();
     
     return (
-        <HeaderWrapper marginTop={insets.top + 8}>
+        <HeaderWrapper paddingTop={insets.top + 8}>
             <HeaderContainer bgColor={theme.colors.background} borderColor={theme.colors.secondary} borderWidth={Platform.OS === 'android' ? 2 : 0}>
                 <HeaderButton onPress={router.back}>
                     <ArrowIcon width={12} height={12} color={theme.colors.primary} style={{transform: [{rotate: '90deg'}]}} />

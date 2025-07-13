@@ -1,4 +1,3 @@
-import { CustomAddTaskHeader } from "@/components/CustomAddTaskHeader";
 import { ThemeNames, themes } from "@/config/themesConfig";
 import { initDB } from "@/db/initDB";
 import { ThemeProvider, useAppTheme } from "@/theme/ThemeContext";
@@ -75,8 +74,7 @@ const MainApp = () => {
       <StatusBar style={theme.dark ? 'light' : 'dark'} backgroundColor={theme.colors.background} />
       <Stack screenOptions={{headerShown: false}}>
         <Stack.Screen name="(tabs)" />
-        {/* <Stack.Screen name="addTask" options={{headerShown: true, sty}} /> */}
-        <Stack.Screen name="addTask" options={{header: () => (<CustomAddTaskHeader />), headerShown: true}} />
+        <Stack.Screen name="addTask" options={{headerShown: false}} />
       </Stack>
     </PaperProvider>
   )

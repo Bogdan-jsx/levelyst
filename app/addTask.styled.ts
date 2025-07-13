@@ -2,9 +2,10 @@ import { RegularText, RegularTextBold, RegularTextToggle } from "@/components/co
 import styled from "styled-components/native";
 
 
-export const Wrapper = styled.SafeAreaView<{paddingBottom: number}>`
+export const Wrapper = styled.SafeAreaView<{paddingBottom: number, bgColor: string}>`
     flex: 1;
     padding-bottom: ${props => props.paddingBottom}px;
+    background-color: ${props => props.bgColor};
 `
 
 export const AddTaskContainer = styled.View`
@@ -16,11 +17,12 @@ export const MainInfoContainer = styled.View`
     gap: 24px;
 `
 
-export const MainInput = styled.TextInput<{borderColor: string}>`
+export const MainInput = styled.TextInput<{borderColor: string, color: string}>`
     padding: 8px 16px;
     border-radius: 18.5px;
     border-width: 2px;
     border-color: ${props => props.borderColor};
+    color: ${props => props.color};
 `
 
 export const DueDate = styled.View`
